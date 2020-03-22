@@ -10,14 +10,22 @@
   </head>
 
   <body>
-
     <header>
       <div class="container">
         <a id="a-title" href="{{ '/' | relative_url }}">
           <h1>{{ site.title | default: site.github.repository_name }}</h1>
         </a>
+        <div class="profile-card">
+          <h3>About me</h3>
+          <p>
+            <strong>Herman Scheele</strong><br>
+            .NET, C#, Sitecore developer and Data Science engineer @ <a href="https://www.tfe.nl">theFactor.e</a>.
+          </p>
+		  <a href="https://twitter.com/intent/tweet?screen_name=funkwurm&ref_src=twsrc%5Etfw" class="twitter-mention-button" data-show-count="false">Tweet to @funkwurm</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+          <a href="https://stackoverflow.com/users/2684660/asontu"><img src="https://stackoverflow.com/users/flair/2684660.png?theme=dark" width="208" height="58" alt="profile for asontu at Stack Overflow, Q&amp;A for professional and enthusiast programmers" title="profile for asontu at Stack Overflow, Q&amp;A for professional and enthusiast programmers"></a>
+        </div>
         <h2>{{ site.description | default: site.github.project_tagline }}</h2>
-
+{% comment %}
         <section id="downloads">
           {% if site.show_downloads %}
             <a href="{{ site.github.zip_url }}" class="btn">Download as .zip</a>
@@ -25,6 +33,7 @@
           {% endif %}
           <a href="{{ site.github.repository_url }}" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
         </section>
+{% endcomment %}
       </div>
     </header>
 
