@@ -85,7 +85,8 @@ $(function () {
 									doClone = false;
 								}
 							}
-							// if a _different_ point from the cloned one was clicked (or there is no clone currently), clone the newly clicked point's ToolTip
+							// if a _different_ point from the cloned one was clicked (or there is no clone currently),
+							// clone the newly clicked point's ToolTip
 							if (doClone) {
 								// clone
 								cloneToolTip = {
