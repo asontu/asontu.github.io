@@ -39,3 +39,5 @@ join ItemPaths ip on ip.ID = sf.ItemId
 where fi.Name like '%never%publish%'
   and sf.Value = '1'
 ```
+
+I'm sure the true Sitecore guru's can tell me how to do this with Sitecore Search. But the above also works when Sitecore isn't working so long as you can query the Database.
