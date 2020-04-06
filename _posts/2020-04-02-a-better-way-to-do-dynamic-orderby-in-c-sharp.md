@@ -85,6 +85,40 @@ queryable = desc
 	: Queryable.OrderBy(queryable, OrderFunctions[orderByField]);
 ```
 
-Et voilà, from 34 lines of unreadable spaghetti to 9 lines of easily maintained and extendable code.
+Et voilà, from 34 lines of unreadable spaghetti to 9 lines of easily maintained and extendable code. Admittedly, the `Expression<Func<SearchResultItem, ` part is a bit lengthy and repetitive. Unfortunately `Expression<>` is a `sealed` class, but you can make a wrapper for it. The end result then looks like this:
+
+```c#
+namespace My.Projects.Namespace
+{
+    using System;
+    using System.Linq.Expressions;
+
+    public class OrderBy<T>
+    {
+        public OrderBy(Expression<Func<SearchResultItem, T>> expression)
+        {
+            this.Expression = expression;
+        }
+
+        public Expression<Func<SearchResultItem, T>> Expression { get; }
+    }
+}
+
+// ...
+
+private static readonly Dictionary<string, dynamic> OrderFunctions =
+	new Dictionary<string, dynamic>
+	{
+		{ "hired", new OrderBy<DateTime>(x => x.DateHired) },
+		{ "name",  new OrderBy<string>(x => x.Name) },
+		{ "age",   new OrderBy<int>(x => x.Age) }
+	};
+
+// ...
+
+queryable = desc
+	? Queryable.OrderByDescending(queryable, OrderFunctions[orderByField].Expression)
+	: Queryable.OrderBy(queryable, OrderFunctions[orderByField].Expression);
+```
 
 And the nice thing is you can pass the `dynamic` expression trees around like variables. The logic behind a sort-column like `"hired"` could be kept in a completely different assembly or namespace to keep a good separation of concerns.
