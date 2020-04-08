@@ -4,9 +4,9 @@ title:  "A better way to do dynamic OrderBy() in C#"
 tags: C#
 ---
 
-A common feature in various applications is to sort some collection by one of it's properties, dependent on some input. Like the column clicked by the user. The implementation takes one `string` or `enum` for the column plus a `bool` or `enum` for ascending vs. descending.
+A common feature in various applications is to sort some collection by one of it's properties, dependent on some input like the column clicked by the user. An implementation might take a `string` or `enum` for the column plus a `bool` or `enum` for ascending vs. descending.
 
-This code then looks something like this:
+The code then looks something like this:
 
 ```c#
 switch (orderByField)
@@ -45,7 +45,7 @@ switch (orderByField)
 }
 ```
 
-This turns into ugly spaghetti code fast. Lots of lines for something that should be trivial. Hard to read, hard to maintain, there has to be a better way.
+This turns into ugly spaghetti code fast. Lots of lines for something that should be trivial, and this is just three columns. Hard to read, hard to maintain, surely there _has_ to be a better way.
 
 So, why can't you just do something like this?
 

@@ -125,6 +125,50 @@ footer a {
 	background: rgba(0, 0, 0, 0.9);
 	padding: .5em .8em;
 	max-width: 208px;
+	
+	h3 {
+		position: relative;
+		margin: 0;
+		
+		label {
+			display: block;
+			pointer-events: none;
+		}
+	}
+	
+	#collapseme {
+		margin-top: 20px;
+	}
+	
+	@media screen and (max-width: 767px) {
+		h3 label {
+			pointer-events: auto;
+			cursor: pointer;
+		}
+		
+		#collapsible ~ h3::after {
+			content: ' ';
+			display: inline-block;
+			position: absolute;
+			top: 13px;
+			right: 0;
+			
+			border-top: 5px solid $theme-color;
+			border-left: 5px solid transparent;
+			border-right: 5px solid transparent;
+			transition: transform .2s ease-out;
+		}
+		
+		#collapsible:not(:checked) ~ h3::after {
+			transform: rotate(-90deg) translateX(1px);
+		}
+		
+		#collapsible:not(:checked) ~ #collapseme {
+			margin: 0;
+			max-height: 0;
+			overflow: hidden;
+		}
+	}
 }
 
 #main_content {
