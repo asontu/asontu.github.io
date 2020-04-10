@@ -137,7 +137,10 @@ footer a {
 	}
 	
 	#collapseme {
-		margin-top: 20px;
+		max-height: 230px;
+		overflow: hidden;
+		transition: max-height .2s ease-out;
+		box-sizing: border-box;
 	}
 	
 	@media screen and (max-width: 767px) {
@@ -164,9 +167,7 @@ footer a {
 		}
 		
 		#collapsible:not(:checked) ~ #collapseme {
-			margin: 0;
 			max-height: 0;
-			overflow: hidden;
 		}
 	}
 }
