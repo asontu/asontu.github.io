@@ -129,6 +129,11 @@ footer a {
 		right: 0;
 		cursor: pointer;
 	}
+	
+	label:focus::before {
+		color: $theme-color;
+		box-shadow: 0 0 3px 2px;
+	}
 
 	label::before {
 		content: ' ';
@@ -457,6 +462,10 @@ hr {
 
 hr:last-of-type {
 	margin-bottom: 0;
+}
+
+b, strong {
+	font-weight: 500;
 }
 
 /* Buttons

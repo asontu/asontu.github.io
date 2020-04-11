@@ -11,6 +11,25 @@
 
 	<body>
 		<input type="checkbox" id="invert" hidden>
+		<script>
+			var lightMode = localStorage.getItem('lightMode');
+			document.getElementById('invert').checked = lightMode === 'true';
+			document.getElementById('invert').onchange = function() {
+				localStorage.setItem('lightMode', this.checked);
+			}
+			window.addEventListener('DOMContentLoaded', (event) => {
+				Array.from(document.querySelectorAll('label[for]')).forEach(label => {
+					label.addEventListener('keydown', e => {
+						// 32 === spacebar
+						// 13 === enter
+						if (e.which === 32 || e.which === 13) {
+							e.preventDefault();
+							label.click();
+						}
+					});
+				});
+			});
+		</script>
 		<div class="bg">
 			<div class="wrapper">
 				<header>
@@ -18,12 +37,12 @@
 						<h1 id="page-title">
 							<a id="a-title" href="{{ '/' | relative_url }}">{{ site.title | default: site.github.repository_name }}</a>
 							<span id="sun-moon"></span>
-							<label for="invert" title="Toggle dark-mode"></label>
+							<label for="invert" title="Toggle dark-mode" tabindex="0"></label>
 						</h1>
 						
 						<div class="profile-card">
 							<input type="checkbox" id="collapsible" hidden>
-							<h3><label for="collapsible">About me</label></h3>
+							<h3><label for="collapsible" tabindex="0">About me</label></h3>
 							<div id="collapseme">
 								<p>
 									<strong>Herman Scheele</strong><br>
