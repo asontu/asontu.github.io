@@ -205,7 +205,7 @@ footer a {
 	}
 
 	.container {
-		transition: background .2s ease-in-out, border .2s ease-in-out;
+		transition: background .2s ease-in-out, border .2s ease-in-out, box-shadow .2s ease-in-out;
 	}
 
 	#stackoverflair {
@@ -225,6 +225,7 @@ footer a {
 
 	.container {
 		background: #fff;
+		box-shadow: 5px 10px 18px #999;
 	}
 
 	header .container {
@@ -239,6 +240,7 @@ footer a {
 	.profile-card {
 		border-color: rgba(0, 0, 0, 0.15);
 		background: rgba(255, 255, 255, 0.9);
+		box-shadow: 5px 10px 18px #999;
 
 		h3::after {
 			border-top-color: $invert-theme-color;
@@ -270,8 +272,6 @@ footer a {
 		box-shadow: 0 0 4px 3px #ffd400;
 
 		&::after {
-			top: -40px;
-			right: -40px;
 			border: 65px solid #ffd400;
 		}
 	}
@@ -308,7 +308,7 @@ footer a {
 	background: rgba(0, 0, 0, 0.9);
 	padding: .5em .8em;
 	max-width: 208px;
-	transition: background .2s ease-in-out, border .2s ease-in-out;
+	transition: background .2s ease-in-out, border .2s ease-in-out, box-shadow .2s ease-in-out;
 
 	h3 {
 		position: relative;
