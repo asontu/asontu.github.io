@@ -3,6 +3,8 @@ description: Tech-blog about C#, Sitecore, T-SQL, JavaScript, Python, Data Scien
 theme: jekyll-theme-hacker
 author: Herman Scheele
 
+staticman_url: https://asontu-comments.herokuapp.com/v2/entry/asontu-comment-bot/asontu.github.io/master/comments
+
 lsi: false
 safe: true
 source: 
