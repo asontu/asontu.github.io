@@ -3,7 +3,10 @@ description: Tech-blog about C#, Sitecore, T-SQL, JavaScript, Python, Data Scien
 theme: jekyll-theme-hacker
 author: Herman Scheele
 
-staticman_url: https://asontu-comments.herokuapp.com/v2/entry/asontu-comment-bot/asontu.github.io/master/comments
+staticman_url: https://asontu-comments.herokuapp.com/v2/entry/asontu/asontu.github.io/master/comments
+reCaptcha:
+  siteKey: 6Lfvn-oUAAAAAG4qUwKJRN6tzpjZQkhtKUKHmUXg
+  secret: vZupUOTI38tM/8thmaaFqk6z+iXY8MHFVtdwnGAChndIT/eRrj2XHzlM0BQimivP4KoZJB+z4Z8qcvAdE9rGclFWxXmYKF6zwkkGJvauA/7zs3UBSdHEjhTMsZ/C5V8EXmo8iNCOEqFCKRJbI7hbA2Nf4qqsRCqc3gUnAjbKAySZdMsxnkXEWsCOFV11n2Hy/yc6hd8EgHuOMpE+NNnJF7n5fZtxhhBzb+n6qmkGFGpTXIG9d3mVLecRZxw9huYr9+pYYbZOwZyKFO8CvLVmv8r2RC8wZCMG7Sqo/Uuvb2UNSTPUnIkqHCFKcEXHaEohDNUYxLvMVBiORkclB5yJLBVONaGSUrDxEPmwOtmDuDcYnogrXG50ozpN4t9xDUAmuLt7c9aRi/sTni9ErSUlIYKdWKggMWI1OSUnz3vbJiykjUVESZTY2WnHzQ05DshDbAdidlIMV6I/AGVXduKms81bfpa63+0fDIRHR2IoMwYLVosDdV3ggOwrJvrwew01S6o/1C4DjCSwk2+lz7JT+jcA19c5cm/l/WuNk+FjtCvcTS10P1p7408YAzJa40/9T6zglK9+O/9/W2+xuzIvj/JD3IkCsa0H+YehODylvZURY1+ZLLUijDHlHLITGXnOL+hBadLvsUVEupC9CQ61syoFu0BdkbLhL2ryrFXEeAk=
 
 lsi: false
 safe: true
