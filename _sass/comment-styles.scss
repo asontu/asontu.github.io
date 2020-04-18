@@ -2,8 +2,8 @@
 // https://github.com/willymcallister/willymcallister.github.io/blob/fbc7f396fbe80186b1abc63e436ec509190c1b3a/assets/main.scss
 
 $base-font-weight: 400;
-$base-font-size:    18px !default;
-$comment-font-size: 17px !default;
+$base-font-size:    16px !default;
+$comment-font-size: 16px !default;
 $base-line-height: 1.5;
 $base-font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","Segoe UI Symbol","Segoe UI Emoji","Apple Color Emoji",Roboto,Helvetica,Arial,sans-serif;
 $text-color: #eaeaea;
@@ -18,8 +18,8 @@ $grey-color-light: #666;
 //
 input, select, textarea, label, button {
 //    @extend body;
-    font: $base-font-weight #{$base-font-size}/#{$base-line-height} $base-font-family;
-    color: $text-color;
+    font-family: $base-font-family;
+	font-weight: $base-font-weight;
     background-color: $background-color;
     -webkit-text-size-adjust: 100%;
     -webkit-font-feature-settings: "kern" 1;
@@ -28,14 +28,16 @@ input, select, textarea, label, button {
             font-feature-settings: "kern" 1;
     font-kerning: normal;
 }
+button {
+    color: $text-color;
+}
+
 fieldset {
     border: none;
     padding: 0;
 }
 
 .textfield {
-    width: 420px;
-    max-width: 100%;
     padding: 0.5rem 0;
 }
 

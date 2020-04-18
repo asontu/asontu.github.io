@@ -12,7 +12,7 @@
 		right: 0;
 		cursor: pointer;
 	}
-	
+
 	label:focus::before {
 		color: $theme-color;
 		box-shadow: 0 0 3px 2px;
@@ -75,6 +75,111 @@
 		transition: all .2s ease-in-out;
 	}
 }
+
+#stackoverflair {
+	display: inline-block;
+	height: 58px;
+	background: url(https://stackoverflow.com/users/flair/2684660.png?theme=clean);
+}
+
+.profile-card {
+	float: right;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	border-radius: 20px;
+	background: rgba(0, 0, 0, 0.9);
+	padding: .5em .8em;
+	max-width: 208px;
+	transition: background .2s ease-in-out, border .2s ease-in-out, box-shadow .2s ease-in-out;
+
+	h3 {
+		position: relative;
+		margin: 0;
+
+		label {
+			display: block;
+			pointer-events: none;
+		}
+	}
+
+	#collapseme {
+		max-height: 230px;
+		overflow: hidden;
+		transition: max-height .2s ease-out;
+		box-sizing: border-box;
+	}
+
+	@media screen and (max-width: 767px) {
+		h3 label {
+			pointer-events: auto;
+			cursor: pointer;
+		}
+
+		#collapsible ~ h3::after {
+			content: ' ';
+			display: inline-block;
+			position: absolute;
+			top: 13px;
+			right: 0;
+
+			border-top: 5px solid $theme-color;
+			border-left: 5px solid transparent;
+			border-right: 5px solid transparent;
+			transition: transform .2s ease-out, border .2s ease-in-out;
+		}
+
+		#collapsible:not(:checked) ~ h3::after {
+			transform: rotate(-90deg) translateX(1px);
+		}
+
+		#collapsible:not(:checked) ~ #collapseme {
+			max-height: 0;
+		}
+	}
+}
+
+section.comments {
+	padding: 0 15px 20px;
+}
+
+.comment, .comment__new {
+	background: rgba(0, 0, 0, 0.4);
+	border-radius: 20px;
+	padding: 10px;
+	transition: background .2s ease-in-out;
+
+	textarea, input[type=text] {
+		box-sizing: border-box;
+		width:100%;
+		background: rgba(0, 0, 0, 0.9);
+		color: #fff;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 20px;
+		transition: all .2s ease-in-out;
+	}
+
+	button {
+		border-radius: 20px;
+		padding: 4px 32px;
+		font-size: 16px;
+		transition: all .2s ease-in-out;
+	}
+
+	textarea {
+		height: 3.5em;
+	}
+}
+
+.comment__new:focus-within textarea {
+	height: 6em;
+}
+
+textarea:focus, input[type=text]:focus, button:focus {
+	outline: 0;
+	box-shadow: 0 0 3px 2px $theme-color;
+}
+
+
+// light-mode
 
 .bg {
 	transition: background .2s ease-in-out, text-shadow .2s ease-in-out, color .2s ease-in-out;
@@ -176,65 +281,17 @@
 			color: #000 !important;
 		}
 	}
-}
 
-#stackoverflair {
-	display: inline-block;
-	height: 58px;
-	background: url(https://stackoverflow.com/users/flair/2684660.png?theme=clean);
-}
-
-.profile-card {
-	float: right;
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	border-radius: 20px;
-	background: rgba(0, 0, 0, 0.9);
-	padding: .5em .8em;
-	max-width: 208px;
-	transition: background .2s ease-in-out, border .2s ease-in-out, box-shadow .2s ease-in-out;
-
-	h3 {
-		position: relative;
-		margin: 0;
-
-		label {
-			display: block;
-			pointer-events: none;
-		}
+	.comment, .comment__new {
+		background: rgba(0, 0, 0, 0.1);
 	}
 
-	#collapseme {
-		max-height: 230px;
-		overflow: hidden;
-		transition: max-height .2s ease-out;
-		box-sizing: border-box;
+	button:not(:hover) {
+		color: $invert-foreground;
 	}
 
-	@media screen and (max-width: 767px) {
-		h3 label {
-			pointer-events: auto;
-			cursor: pointer;
-		}
-
-		#collapsible ~ h3::after {
-			content: ' ';
-			display: inline-block;
-			position: absolute;
-			top: 13px;
-			right: 0;
-
-			border-top: 5px solid $theme-color;
-			border-left: 5px solid transparent;
-			border-right: 5px solid transparent;
-			transition: transform .2s ease-out, border .2s ease-in-out;
-		}
-
-		#collapsible:not(:checked) ~ h3::after {
-			transform: rotate(-90deg) translateX(1px);
-		}
-
-		#collapsible:not(:checked) ~ #collapseme {
-			max-height: 0;
-		}
+	textarea, input[type=text] {
+		background: #fff;
+		color: $invert-foreground;
 	}
 }
