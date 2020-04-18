@@ -145,6 +145,7 @@ section.comments {
 	background: rgba(0, 0, 0, 0.4);
 	border-radius: 20px;
 	padding: 10px;
+	margin-bottom: 1em;
 	transition: background .2s ease-in-out;
 
 	textarea, input[type=text] {
@@ -176,6 +177,19 @@ section.comments {
 textarea:focus, input[type=text]:focus, button:focus {
 	outline: 0;
 	box-shadow: 0 0 3px 2px $theme-color;
+}
+
+.modal {
+	color: #000;
+	
+	button {
+		color: #000;
+	}
+	
+	h3, a {
+		color: $invert-theme-color;
+		text-shadow: 0 0;
+	}
 }
 
 
