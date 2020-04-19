@@ -85,6 +85,7 @@ var addComment = {
     }
 
     comm.parentNode.insertBefore( respond, comm.nextSibling );  //move the form from the bottom to above the next sibling
+	$(respond).addClass('child');                     //indent reply form
     if ( post && postId ) {
       post.value = postId;
     }
@@ -105,6 +106,7 @@ var addComment = {
       t.I( 'comment-replying-to-uid' ).value = null;
       temp.parentNode.insertBefore( respond, temp );  //move the comment form to its original location
       temp.parentNode.removeChild( temp );            //remove the bookmark div
+	  $(respond).removeClass('child');                //unindent form
       this.style.display = 'none';                    //make the cancel link invisible
       this.onclick = null;                            //retire the onclick handler
       return false;

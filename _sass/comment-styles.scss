@@ -74,6 +74,31 @@ button:hover {
     color: white;
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(359deg);
+  }
+}
+
+.icon {
+  display: inline-block;
+  fill: currentColor;
+  height: 1em;
+  line-height: 1;
+  position: relative;
+  top: -0.125em; // fine-tune alignment
+  vertical-align: middle;
+  width: 1em;
+
+  &.spin {
+    animation: spin 2s infinite linear;
+  }
+}
+
 //
 // Staticman existing comments
 //
@@ -104,8 +129,9 @@ button:hover {
     padding: 0px 0px 0px 0px;
     margin-bottom: 1em;
 }
-.comment.child {
-    margin-left: 3em;
+.child {
+    margin-left: 8%;
+	margin-top: -.6em;
 }
 .comment__reply-link {
     color: $grey-color;
