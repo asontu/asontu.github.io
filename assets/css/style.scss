@@ -222,6 +222,7 @@ textarea:focus, input[type=text]:focus, button:focus {
 	
 	.g-recaptcha {
 		transition: filter .2s ease-in-out;
+		filter: invert(1) hue-rotate(180deg);
 	}
 }
 
@@ -314,6 +315,6 @@ textarea:focus, input[type=text]:focus, button:focus {
 	}
 	
 	.g-recaptcha {
-		filter: invert(1) hue-rotate(180deg);
+		filter: invert(0) hue-rotate(0deg);
 	}
 }
