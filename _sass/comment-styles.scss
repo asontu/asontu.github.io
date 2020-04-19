@@ -170,7 +170,8 @@ button:hover {
 .modal {
     display: none;
     position: absolute;
-    width: 330px;
+	width: 100%;
+    max-width: 330px;
     top: 1em;
     left: 50%;
     margin-left: calc(-330px / 2);
@@ -180,6 +181,12 @@ button:hover {
     padding: 16px;
     border-radius: 20px;
     background: white;
+	
+	@media screen and (max-width: 396px) {
+		margin: 0;
+		top:0;
+		left:0;
+	}
 }
 .mdl-shadow--16dp {
     box-shadow: 0 16px 24px 2px rgba(0,0,0,.14),0 6px 30px 5px rgba(0,0,0,.12),0 8px 10px -5px rgba(0,0,0,.2);

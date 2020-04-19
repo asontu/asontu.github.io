@@ -1,13 +1,11 @@
 // Static comments
 // from: https://github.com/eduardoboucas/popcorn/blob/gh-pages/js/main.js
+var cancelReplyOnModalClose = false;
 (function ($) {
   var $comments = $('.js-comments');
 
   $('.js-form').submit(function () {
     var form = this;
-	
-	var cancelReplyOnModalClose = false;
-
 
     $("#comment-form-submit").html(
       '<svg class="icon spin"><use xlink:href="#icon-loading"></use></svg> Sending...'
