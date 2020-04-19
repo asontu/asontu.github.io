@@ -219,6 +219,10 @@ textarea:focus, input[type=text]:focus, button:focus {
 	div.highlight, code.highlighter-rouge {
 		transition: filter .2s ease-in-out;
 	}
+	
+	.g-recaptcha {
+		transition: filter .2s ease-in-out;
+	}
 }
 
 #invert:checked ~ .bg {
@@ -307,5 +311,9 @@ textarea:focus, input[type=text]:focus, button:focus {
 	textarea, input[type=text] {
 		background: #fff;
 		color: $invert-foreground;
+	}
+	
+	.g-recaptcha {
+		filter: invert(1) hue-rotate(180deg);
 	}
 }
