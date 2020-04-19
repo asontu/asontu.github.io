@@ -170,6 +170,10 @@ section.comments {
 	}
 }
 
+.comment__new {
+	margin-top: 1em;
+}
+
 .comment__new:focus-within textarea {
 	height: 6em;
 }
