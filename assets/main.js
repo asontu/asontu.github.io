@@ -5,6 +5,8 @@
 
   $('.js-form').submit(function () {
     var form = this;
+	
+	var cancelReplyOnModalClose = false;
 
 
     $("#comment-form-submit").html(
@@ -18,6 +20,7 @@
       data: $(this).serialize(),
       contentType: 'application/x-www-form-urlencoded',
       success: function (data) {
+		cancelReplyOnModalClose = true;
         showModal('Comment submitted', 'Thanks! Your comment is <a href="https://github.com/asontu/asontu.github.io/pulls">pending</a>. It will appear when approved.');
 
         $("#comment-form-submit")
@@ -30,6 +33,7 @@
       error: function (err) {
         console.log(err);
         var ecode = (err.responseJSON || {}).errorCode || "unknown";
+		cancelReplyOnModalClose = false;
         showModal('Error', 'An error occured.<br>[' + ecode + ']');
         $("#comment-form-submit").html("Submit")
         $(form).removeClass('disabled');
@@ -40,13 +44,17 @@
   });
 
   $('.js-close-modal').click(function () {
-    $('body').removeClass('show-modal');
+    $('#respond').removeClass('show-modal');
+	$cancel = $('#cancel-comment-reply-link');
+	if (cancelReplyOnModalClose && $cancel.css('display') !== 'none') {
+		$cancel.click();
+	}
   });
 
   function showModal(title, message) {
     $('.js-modal-title').text(title);
     $('.js-modal-text').html(message);
-    $('body').addClass('show-modal');
+    $('#respond').addClass('show-modal');
   }
 })(jQuery);
 
