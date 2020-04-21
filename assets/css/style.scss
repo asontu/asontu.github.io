@@ -196,6 +196,13 @@ textarea:focus, input[type=text]:focus, button:focus {
 	}
 }
 
+.g-recaptcha div {
+	width: 158px;
+	height: 138px;
+	overflow: hidden;
+	border-radius: 3px;
+}
+
 
 // light-mode
 
@@ -225,8 +232,8 @@ textarea:focus, input[type=text]:focus, button:focus {
 	}
 	
 	.g-recaptcha {
-		transition: filter .2s ease-in-out;
 		filter: invert(1) hue-rotate(180deg);
+		transition: filter .2s ease-in-out;
 	}
 }
 
