@@ -141,6 +141,91 @@
 	margin: 1.6em 0;
 }
 
+.pagination {
+	text-align: center;
+	margin-top: 1em;
+	
+	a, span {
+		box-sizing: border-box;
+		display: inline-block;
+		min-width: 34px;
+		min-height: 34px;
+		font-size: 1.3em;
+		padding: 0 5px;
+		vertical-align: top;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		border-radius: 20px;
+		position: relative;
+		margin: 0 1%;
+		
+		&::before, &.first::after, &.last::after {
+			content: '';
+			position: absolute;
+		}
+		
+		&.first::before {
+			left: 3px;
+			top: 8px;
+			border-top: 8px solid transparent;
+			border-right: 11px solid #fff;
+			border-bottom: 8px solid transparent;
+		}
+		
+		&.first::after {
+			left: 14px;
+			top: 8px;
+			border-top: 8px solid transparent;
+			border-right: 11px solid #fff;
+			border-bottom: 8px solid transparent;
+		}
+		
+		&.previous::before {
+			left: 5px;
+			top: 8px;
+			border-top: 8px solid transparent;
+			border-right: 18px solid #fff;
+			border-bottom: 8px solid transparent;
+		}
+		
+		&.next::before {
+			left: 8px;
+			top: 8px;
+			border-top: 8px solid transparent;
+			border-left: 18px solid #fff;
+			border-bottom: 8px solid transparent;
+		}
+		
+		&.last::before {
+			left: 7px;
+			top: 8px;
+			border-top: 8px solid transparent;
+			border-left: 11px solid #fff;
+			border-bottom: 8px solid transparent;
+		}
+		
+		&.last::after {
+			left: 18px;
+			top: 8px;
+			border-top: 8px solid transparent;
+			border-left: 11px solid #fff;
+			border-bottom: 8px solid transparent;
+		}
+	}
+	
+	a {
+		background: $theme-color;
+	}
+	
+	span {
+		background: rgba(0, 0, 0, 0.9);
+		
+		&::before, &::after {
+			border-left-color: #666 !important;
+			border-right-color: #666 !important;
+		}
+	}
+}
+
 section.comments {
 	padding: 0 15px 20px;
 }
@@ -235,6 +320,20 @@ textarea:focus, input[type=text]:focus, button:focus {
 		transition: filter .2s ease-in-out;
 	}
 	
+	.pagination {
+		a {
+			transition: background .2s ease-in-out;
+		}
+		
+		span {
+			transition: background .2s ease-in-out, border .2s ease-in-out;
+			
+			&::before, &::after {
+				transition: border .2s ease-in-out;
+			}
+		}
+	}
+	
 	.g-recaptcha {
 		filter: invert(1) hue-rotate(180deg);
 		transition: filter .2s ease-in-out;
@@ -313,6 +412,22 @@ textarea:focus, input[type=text]:focus, button:focus {
 		&::selection {
 			background: #f93 !important;
 			color: #000 !important;
+		}
+	}
+	
+	.pagination {
+		a {
+			background: $invert-theme-color;
+		}
+		
+		span {
+			background: #fff;
+			border-color: rgba(0, 0, 0, .15);
+			
+			&::before, &::after {
+				border-left-color: #aaa !important;
+				border-right-color: #aaa !important;
+			}
 		}
 	}
 
