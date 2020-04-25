@@ -165,3 +165,16 @@ var addComment = {
     return document.getElementById( id );
   }
 };
+// Usability for checkbox labels modified from https://alligator.io/css/collapsible/#a-note-on-accessibility
+window.addEventListener('DOMContentLoaded', (event) => {
+	Array.from(document.querySelectorAll('label[for]')).forEach(label => {
+		label.addEventListener('keydown', e => {
+			// 32 === spacebar
+			// 13 === enter
+			if (e.which === 32 || e.which === 13) {
+				e.preventDefault();
+				label.click();
+			}
+		});
+	});
+});
