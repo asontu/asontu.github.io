@@ -10,3 +10,5 @@ This repository exists to support [my blog](https://asontu.github.io/). If you'r
 *	The theme is a heavily modified version of the [Hacker theme](https://pages-themes.github.io/hacker/) as it's one of the [supported themes](https://pages.github.com/themes/) on GitHub Pages. Background SVG and inspiration taken from the [Leaf](https://jekyll-themes.com/leaf/) theme, which itself is not supported on GitHub Pages
 *	Pure CSS Light/dark mode toggle inspired by [this codepen](https://codepen.io/demilad/pen/bZRjpb)
 *	Pure CSS collapsible based on [this article](https://alligator.io/css/collapsible/)
+*	Tag-filtered overviews based on [this article](https://longqian.me/2017/02/09/github-jekyll-tag/#4-display-the-tags-of-a-post)<br>
+	_(start at step 4 though, 1-3 are obvious or unnecessary)_

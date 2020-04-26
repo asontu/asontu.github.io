@@ -225,6 +225,27 @@
 	}
 }
 
+.tags {
+	color: #666;
+	
+	a {
+		color: #aaa !important;
+	}
+}
+
+.tag-cloud {
+	list-style: none;
+	margin-block-start: unset;
+	padding-inline-start: 0;
+	
+	li {
+		line-height: 1;
+		vertical-align: middle;
+		margin: 0;
+		display: inline-block;
+	}
+}
+
 section.comments {
 	padding: 0 15px 20px;
 }

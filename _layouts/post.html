@@ -9,7 +9,14 @@ layout: default
 	{{content}}
 	
 {%	if page.tags
-%}	<small>tags: <em>{{ page.tags | join: "</em> - <em>" }}</em></small>
+%}{%	capture tags_html
+%}			<small class="tags">tags:
+{%				for tag in page.tags
+%}					<a href="/tags/{{ tag | replace: '#', '-sharp' }}"><em>{{ tag | capitalize }}</em></a> - 
+{%				endfor
+%}			</small>
+{%		endcapture
+%}		{{ tags_html | normalize_whitespace | replace: ' - </small>', '</small>' }}
 {%	endif
 %}</section>
 

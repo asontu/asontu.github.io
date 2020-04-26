@@ -1,0 +1,32 @@
+---
+layout: default
+min_font: 12
+max_font: 24
+---
+
+<section id="main_content">
+	<h2>Tag-cloud</h2>
+	<ul class="tag-cloud">
+{%		for tag in site.tags
+%}{%		if min_size == nil or min_size > tag[1].size
+%}{%			assign min_size = tag[1].size
+%}{%		endif
+%}{%		if max_size == nil or max_size < tag[1].size
+%}{%			assign max_size = tag[1].size
+%}{%		endif
+%}{%	endfor
+
+%}{%	comment
+%}				Implement Y = (X-A)/(B-A) * (D-C) + C from https://stackoverflow.com/questions/345187/math-mapping-numbers
+{%		endcomment
+
+%}{%	assign divisor = max_size | minus: min_size | at_least: 1
+%}{%	assign target_max_min = page.max_font | minus: page.min_font
+	
+%}{%	for tag in site.tags
+%}{%		assign font_size = tag[1].size | minus: min_size | divided_by: divisor | times: target_max_min | plus: page.min_font
+%}			<li><a href="/tags/{{ tag[0] | replace: '#', '-sharp' }}" style="font-size: {{ font_size }}px">{{ tag[0] | capitalize }}</a></li>
+{%		endfor
+%}	</ul>
+	<hr>
+</section>
