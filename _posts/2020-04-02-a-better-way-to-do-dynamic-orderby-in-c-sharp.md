@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "A better way to do dynamic OrderBy() in C#"
-tags: C#
+tags: c# back-end
 ---
 
 A common feature in various applications is to sort some collection by one of it's properties, dependent on some input like the column clicked by the user. An implementation might take a `string` or `enum` for the column plus a `bool` or `enum` for ascending vs. descending.

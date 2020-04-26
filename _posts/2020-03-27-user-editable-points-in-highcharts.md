@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "User-editable points in Highcharts"
-tags: JavaScript
+tags: front-end javascript
 ---
 
 A customer wanted data displayed in a chart and be able to edit a single point. It seemed to me the best UX would be to have a button in Highchart's Tooltip with which to edit the value. Searching for a solution I found more people asking for this feature but not really an answer I could work with.

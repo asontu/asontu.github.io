@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Sitecore path in SQL Query"
-tags: sitecore sql t-sql
+tags: sitecore t-sql back-end
 ---
 
 When trouble-shooting Sitecore issues, sometimes you wanna dive directly into the SQL Database and query around in `dbo.Items`. But you might want to query an item's Sitecore-path, like in the `where` clause. This recursive common table expression makes that very easy:

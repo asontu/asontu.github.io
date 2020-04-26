@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Styling external iframe content"
-tags: CSS
+tags: css front-end
 ---
 
 When implementing [staticman](https://staticman.net/) comments for this blog I ran into the issue that the blog has a dark and a light mode that you can switch between (the switch in the upper right) but the ReCaptcha can't dynamically switch between the dark and light themes it has. And since the ReCaptcha is an iframe from another domain, you can't apply CSS or JavaScript as one normally would. So now what, pick a theme and give up?
