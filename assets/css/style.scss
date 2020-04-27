@@ -140,6 +140,58 @@
 	margin: 1.6em 0;
 }
 
+div.gist {
+	tab-size: 4;
+	-moz-tab-size: 4;
+
+	div.gist-file {
+		border-radius: 20px;
+		transition: border .2s ease-in-out;
+	}
+
+	div.gist-data {
+		border-radius: 20px 20px 0 0;
+		transition: filter .2s ease-in-out;
+		
+		*::selection {
+			background: #338fff !important;
+			color: #fff !important;
+			transition: all .2s ease-in-out;
+		}
+	}
+	
+	div.gist-meta {
+		border-radius: 0 0 20px 20px;
+		transition: background .2s ease-in-out;
+		
+		a {
+			color: #666 !important;
+		}
+	}
+}
+
+#invert:not(:checked) ~ .bg {
+	div.gist {
+
+		div.gist-file {
+			border-color: rgba(255,255,255,0.15);
+		}
+
+		div.gist-data {
+			filter: invert(1) hue-rotate(45deg);
+			
+			*::selection {
+				background: #ff5064 !important;
+				color: #000 !important;
+			}
+		}
+		
+		div.gist-meta {
+			background: #000;
+		}
+	}
+}
+
 .pagination {
 	text-align: center;
 	margin-top: 1em;
