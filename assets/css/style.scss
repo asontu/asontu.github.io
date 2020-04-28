@@ -407,7 +407,7 @@ textarea:focus, input[type=text]:focus, button:focus {
 	}
 	
 	.g-recaptcha {
-		filter: invert(1) hue-rotate(180deg);
+		filter: invert(1) hue-rotate(180deg) saturate(2.5);
 		transition: filter .2s ease-in-out;
 	}
 }
