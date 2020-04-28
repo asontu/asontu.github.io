@@ -29,4 +29,25 @@ max_font: 24
 {%		endfor
 %}	</ul>
 	<hr>
+	<ul class="tree-menu">
+{%		assign years = site.posts | group_by_exp: 'post', 'post.date | date: "%Y"'
+%}{%	for year in years
+%}			<li><input type="checkbox" id="ul{{ year.name }}" checked>
+				<label for="ul{{ year.name }}" tabindex="0">{{ year.name }}</label>
+				<ul>
+{%					assign months = year.items | group_by_exp: 'post', 'post.date | date: "%B"'
+%}{%				for month in months
+%}						<li><input type="checkbox" id="ul{{ year.name }}{{ month.name }}" checked>
+							<label for="ul{{ year.name }}{{ month.name }}" tabindex="0">{{ month.name }}</label>
+							<ul>
+{%								for post in month.items
+%}									<li data-date="{{ post.date | date: '%-d' }}"><a href="{{ post.url }}">{{ post.title }}</a></li>
+{%								endfor
+%}							</ul>
+						</li>
+{%					endfor
+%}				</ul>
+			</li>
+{%		endfor
+%}	</ul>
 </section>
