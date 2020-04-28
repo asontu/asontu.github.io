@@ -5,7 +5,7 @@ max_font: 24
 ---
 
 <section id="main_content">
-	<h2>Tag-cloud</h2>
+	<h2>Tag-cloud:</h2>
 	<ul class="tag-cloud">
 {%		for tag in site.tags
 %}{%		if min_size == nil or min_size > tag[1].size
@@ -29,6 +29,7 @@ max_font: 24
 {%		endfor
 %}	</ul>
 	<hr>
+	<h2>Archive:</h2>
 	<ul class="tree-menu">
 {%		assign years = site.posts | group_by_exp: 'post', 'post.date | date: "%Y"'
 %}{%	for year in years
@@ -50,4 +51,5 @@ max_font: 24
 			</li>
 {%		endfor
 %}	</ul>
+	<hr>
 </section>
