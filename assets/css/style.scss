@@ -170,6 +170,23 @@ div.gist {
 	}
 }
 
+div.highlight {
+	pre::-webkit-scrollbar {
+		width: 10px;
+		height: 10px;
+	}
+	
+	pre::-webkit-scrollbar-thumb {
+		background: #3e3e3e;
+		border-radius: 5px;
+	}
+	
+	pre::-webkit-scrollbar-button {
+		width: 20px;
+		height: 20px;
+	}
+}
+
 #invert:not(:checked) ~ .bg {
 	div.gist {
 
