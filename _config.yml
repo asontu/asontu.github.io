@@ -11,13 +11,15 @@ reCaptcha:
 paginate: 5
 paginate_path: "/:num/"
 
+google_analytics: UA-165352843-1
+
 lsi: false
 safe: true
 source: 
 incremental: false
 highlighter: rouge
 gist:
-  noscript: false
+  noscript: true
 kramdown:
   math_engine: mathjax
   syntax_highlighter: rouge
