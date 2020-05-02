@@ -8,9 +8,9 @@ layout: default
 		{{ post.excerpt }}
 		<hr>
 {%	endfor
-%}
-	<!-- Pagination links -->
-	<div class="pagination">
+
+%}{% if paginator.previous_page or paginator.next_page
+%}		<div class="pagination">
 {%		if paginator.previous_page
 %}			<a href="{{ '/' | relative_url }}" class="first" title="Go to first page"></a>
 			<a href="{{ paginator.previous_page_path }}" class="previous" title="Go to previous page"></a>
@@ -29,4 +29,5 @@ layout: default
 			<span class="last"></span>
 {%		endif
 %}	</div>
-</section>
+{%	endif
+%}</section>
