@@ -2,6 +2,13 @@ title: Asontu
 description: Tech-blog about C#, Sitecore, T-SQL, Front-end, Python, Data Science and everything in between run by Herman Scheele
 theme: jekyll-theme-hacker
 author: Herman Scheele
+logo: /assets/images/asontu-banner.png
+image: /assets/images/asontu-banner.png
+defaults:
+  - scope:
+      path: ""
+    values:
+      image: /assets/images/asontu-banner.png
 
 staticman_url: https://asontu-comments.herokuapp.com/v2/entry/asontu/asontu.github.io/master/comments
 reCaptcha:
