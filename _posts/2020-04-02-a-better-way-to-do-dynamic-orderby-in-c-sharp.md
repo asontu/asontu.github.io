@@ -8,7 +8,7 @@ A common feature in various applications is to sort some collection by one of it
 
 The code then looks something like this:
 
-```c#
+{% highlight c# linenos %}
 switch (orderByField)
 {
 	case "hired":
@@ -43,13 +43,14 @@ switch (orderByField)
 		break;
 	// etc.
 }
-```
+{% endhighlight %}
 
 This turns into ugly spaghetti code fast. Lots of lines for something that should be trivial, and this is just three columns. Hard to read, hard to maintain, surely there _has_ to be a better way.
 
 So, why can't you just do something like this?
 
-```c#
+<div class="pseudo-code">
+{% highlight c# linenos %}
 private static readonly Dictionary<string, object> OrderFunctions =
 	new Dictionary<string, object>
 	{
@@ -61,13 +62,14 @@ private static readonly Dictionary<string, object> OrderFunctions =
 queryable = desc
 	? queryable.OrderByDescending(OrderFunctions[orderByField])
 	: queryable.OrderBy(OrderFunctions[orderByField]);
-```
+{% endhighlight %}
+</div>
 
 The reason the above won't work is that the lambda expressions get types `Func<string, DateTime>` and `Func<string, string>` etc. which denotes a [delegate](https://docs.microsoft.com/en-us/dotnet/api/system.func-2?view=netframework-4.8) that is pretty much a pointer to a method, i.e. a compiled piece of code. In order to pass this logic on to a SQL Database or Sitecore ContentSearch, it needs to be an [expression tree](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees/) that can then be converted to the equivalent SQL statement or other implementation of that domain.
 
 As well, LINQ-to-SQL (and possibly other LINQ-to-Something) needs to know the return-type (`DateTime`, `string` and `int` above) of the `Func<>` at runtime, and this is hidden if the value-type of the `Dictionary<>` is `object`. To make this work, we need to explicitly state the type of each function and set the value-type of our `Dictionary<>` to `dynamic`:
 
-```c#
+{% highlight c# linenos %}
 private static readonly Dictionary<string, dynamic> OrderFunctions =
 	new Dictionary<string, dynamic>
 	{
@@ -75,19 +77,19 @@ private static readonly Dictionary<string, dynamic> OrderFunctions =
 		{ "name",  (Expression<Func<SearchResultItem, string>>)(x => x.Name) },
 		{ "age",   (Expression<Func<SearchResultItem, int>>)(x => x.Age) }
 	};
-```
+{% endhighlight %}
 
 Alright, so far so good, but now the `.OrderBy()` and `.OrderByDescending()` extension methods seem kaput? The problem is that the extension method syntax doesn't play nice with our `dynamic` type, so finally these have to be rewritten like so:
 
-```c#
+{% highlight c# linenos %}
 queryable = desc
 	? Queryable.OrderByDescending(queryable, OrderFunctions[orderByField])
 	: Queryable.OrderBy(queryable, OrderFunctions[orderByField]);
-```
+{% endhighlight %}
 
-Et voilà, from 34 lines of unreadable spaghetti to 9 lines of easily maintained and extendable code. Admittedly, the `Expression<Func<SearchResultItem, ` part is a bit lengthy and repetitive. Unfortunately `Expression<>` is a `sealed` class, but you can make a wrapper for it. The end result then looks like this:
+Et voilà, from 34 lines of unreadable spaghetti to 10 lines of easily maintained and extendable code. Admittedly, the `Expression<Func<SearchResultItem, ` part is a bit lengthy and repetitive. Unfortunately `Expression<>` is a `sealed` class, but you can make a wrapper for it. The end result then looks like this:
 
-```c#
+{% highlight c# linenos %}
 namespace My.Projects.Namespace
 {
     using System;
@@ -119,6 +121,6 @@ private static readonly Dictionary<string, dynamic> OrderFunctions =
 queryable = desc
 	? Queryable.OrderByDescending(queryable, OrderFunctions[orderByField].Expression)
 	: Queryable.OrderBy(queryable, OrderFunctions[orderByField].Expression);
-```
+{% endhighlight %}
 
 And the nice thing is you can pass the `dynamic` expression trees around like variables. The logic behind a sort-column like `"hired"` could be kept in a completely different assembly or namespace to keep a good separation of concerns.

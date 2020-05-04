@@ -28,7 +28,7 @@ This means that `hue-rotate(180deg)` will rotate all colors to the opposite colo
 
 This is what I ended up using, as you can see beneath this article when viewing in dark mode.
 
-```css
+{% highlight css linenos %}
 /* Default dark mode: */
 .g-recaptcha {
 	filter: invert(1) hue-rotate(180deg);
@@ -41,7 +41,7 @@ This is what I ended up using, as you can see beneath this article when viewing 
 .g-recaptcha {
 	filter: invert(0) hue-rotate(0deg);
 }
-```
+{% endhighlight %}
 
 Resulting in a blue ReCaptcha logo, a green check mark and a red warning text. All as intended and in alignment with the UX cues they originally had. Sure it's not the exact colors of the native dark theme, but close enough and better matching my duo-themed blog.
 

@@ -1,4 +1,3 @@
-@import "rouge-base16-dark";
 @import "default_colors";
 
 $body-foreground: #eaeaea !default;
@@ -180,30 +179,6 @@ blockquote {
 	color: $blockquote-color;
 	padding-left: 10px;
 	border-left: 1px dotted $blockquote-border;
-}
-
-pre {
-	background: rgba(0, 0, 0, 0.9);
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	padding: 10px;
-	-moz-tab-size: 4;
-	tab-size: 4;
-	font-size: 12px;
-	color: $theme-color;
-	border-radius: 20px;
-	word-wrap: normal;
-	overflow: auto;
-	overflow-y: hidden;
-}
-
-code.highlighter-rouge {
-	background: rgba(0,0,0,0.9);
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	padding: 0px 3px;
-	margin: 0px -1px;
-	font-size: 14px;
-	color: #aa759f;
-	border-radius: 5px;
 }
 
 table {

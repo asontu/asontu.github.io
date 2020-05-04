@@ -11,8 +11,8 @@ So I went to work and came up with this, using [this Stack Overflow answer cloni
 Code below and demo on [JSFiddle](https://jsfiddle.net/joLq0ukx/). Click a point, it sticks, double-click the value and a prompt comes up for a new value.
 
 {% gist 66ba5f060ef79b3d37f850b1292e619e %}
-<noscript markdown="1">
-```js
+<noscript>
+{% highlight js linenos %}
 // Plugin code 
 (function (Highcharts) {
 
@@ -186,5 +186,5 @@ $(function () {
 		setVisibility(chart.tooltip.label, 'visible');
 	});
 });
-```
+{% endhighlight %}
 </noscript>
