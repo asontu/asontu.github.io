@@ -11,23 +11,23 @@ layout: default
 
 %}{% if paginator.previous_page or paginator.next_page
 %}		<div class="pagination">
-{%		if paginator.previous_page
-%}			<a href="{{ '/' | relative_url }}" class="first" title="Go to first page"></a>
-			<a href="{{ paginator.previous_page_path }}" class="previous" title="Go to previous page"></a>
-{%		else
-%}			<span class="first"></span>
-			<span class="previous"></span>
-{%		endif
-%}		<span class="page_number" title="Page {{ paginator.page }} out of {{ paginator.total_pages }} ">
-			{{ paginator.page }}
-		</span>
-{%		if paginator.next_page
-%}			<a href="{{ paginator.next_page_path }}" class="next" title="Go to next page"></a>
-			<a href="{{ paginator.next_page_path | replace: paginator.next_page, paginator.total_pages }}" class="last" title="Go to last page"></a>
-{%		else
-%}			<span class="next"></span>
-			<span class="last"></span>
-{%		endif
-%}	</div>
+{%			if paginator.previous_page
+%}				<a href="{{ '/' | relative_url }}" class="first" title="Go to first page"></a>
+				<a href="{{ paginator.previous_page_path }}" class="previous" title="Go to previous page"></a>
+{%			else
+%}				<span class="first"></span>
+				<span class="previous"></span>
+{%			endif
+%}			<span class="page_number" title="Page {{ paginator.page }} out of {{ paginator.total_pages }} ">
+				{{ paginator.page }}
+			</span>
+{%			if paginator.next_page
+%}				<a href="{{ paginator.next_page_path }}" class="next" title="Go to next page"></a>
+				<a href="{{ paginator.next_page_path | replace: paginator.next_page, paginator.total_pages }}" class="last" title="Go to last page"></a>
+{%			else
+%}				<span class="next"></span>
+				<span class="last"></span>
+{%			endif
+%}		</div>
 {%	endif
 %}</section>

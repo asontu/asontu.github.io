@@ -4,6 +4,8 @@
 @import 'jekyll-theme-hacker';
 @import "comment-styles";
 
+$transition: .2s ease-in-out;
+
 #page-title {
 	position: relative;
 
@@ -28,7 +30,7 @@
 		border-radius: 20px;
 		position: absolute;
 		right: 0;
-		transition: border .2s ease-in-out;
+		transition: border $transition;
 	}
 
 	label::after {
@@ -43,7 +45,7 @@
 		position: absolute;
 		right: 23px;
 		top: 3px;
-		transition: all .2s ease-in-out;
+		transition: all $transition;
 	}
 }
 
@@ -57,7 +59,7 @@
     width: 34px;
     border-radius: 100%;
     overflow: hidden;
-	transition: all .2s ease-in-out;
+	transition: all $transition;
 
 	&::after {
 		content: ' ';
@@ -71,7 +73,7 @@
 		border-radius: 100%;
 		border: 17px solid #fff;
 		opacity: .7;
-		transition: all .2s ease-in-out;
+		transition: all $transition;
 	}
 }
 
@@ -88,7 +90,7 @@
 	background: rgba(0, 0, 0, 0.9);
 	padding: .5em .8em;
 	max-width: 208px;
-	transition: background .2s ease-in-out, border .2s ease-in-out, box-shadow .2s ease-in-out;
+	transition: background $transition, border $transition, box-shadow $transition;
 
 	h3 {
 		position: relative;
@@ -123,7 +125,7 @@
 			border-top: 5px solid $theme-color;
 			border-left: 5px solid transparent;
 			border-right: 5px solid transparent;
-			transition: transform .2s ease-out, border .2s ease-in-out;
+			transition: transform .2s ease-out, border $transition;
 		}
 
 		#collapsible:not(:checked) ~ h3::after {
@@ -146,23 +148,23 @@ div.gist {
 
 	div.gist-file {
 		border-radius: 20px;
-		transition: border .2s ease-in-out;
+		transition: border $transition;
 	}
 
 	div.gist-data {
 		border-radius: 20px 20px 0 0;
-		transition: filter .2s ease-in-out;
+		transition: filter $transition;
 		
 		*::selection {
 			background: #338fff !important;
 			color: #fff !important;
-			transition: all .2s ease-in-out;
+			transition: all $transition;
 		}
 	}
 	
 	div.gist-meta {
 		border-radius: 0 0 20px 20px;
-		transition: background .2s ease-in-out;
+		transition: background $transition;
 		
 		a {
 			color: #666 !important;
@@ -387,7 +389,7 @@ section.comments {
 	border-radius: 20px;
 	padding: 10px;
 	margin-bottom: 1em;
-	transition: background .2s ease-in-out;
+	transition: all $transition;
 
 	textarea, input[type=text] {
 		box-sizing: border-box;
@@ -396,14 +398,14 @@ section.comments {
 		color: #fff;
 		border: 1px solid rgba(255, 255, 255, 0.15);
 		border-radius: 20px;
-		transition: all .2s ease-in-out;
+		transition: all $transition;
 	}
 
 	button {
 		border-radius: 20px;
 		padding: 4px 32px;
 		font-size: 16px;
-		transition: all .2s ease-in-out;
+		transition: all $transition;
 	}
 
 	textarea {
@@ -448,47 +450,47 @@ textarea:focus, input[type=text]:focus, button:focus {
 // light-mode
 
 .bg {
-	transition: background .2s ease-in-out, text-shadow .2s ease-in-out, color .2s ease-in-out;
+	transition: background $transition, text-shadow $transition, color $transition;
 
 	h1, h2, h3, h4, h5, h6, a {
-		transition: color .2s ease-in-out, text-shadow .2s ease-in-out;
+		transition: color $transition, text-shadow $transition;
 	}
 
 	hr {
-		transition: border .2s ease-in-out, color .2s ease-in-out;
+		transition: border $transition, color $transition;
 	}
 
 	.container {
-		transition: background .2s ease-in-out, border .2s ease-in-out, box-shadow .2s ease-in-out;
+		transition: background $transition, border $transition, box-shadow $transition;
 	}
 
 	#stackoverflair {
 		img {
-			transition: opacity .2s ease-in-out;
+			transition: opacity $transition;
 		}
 	}
 
 	code.highlighter-rouge {
-		transition: filter .2s ease-in-out;
+		transition: filter $transition;
 	}
 	
 	.pagination {
 		a {
-			transition: background .2s ease-in-out;
+			transition: background $transition;
 		}
 		
 		span {
-			transition: background .2s ease-in-out, border .2s ease-in-out;
+			transition: background $transition, border $transition;
 			
 			&::before, &::after {
-				transition: border .2s ease-in-out;
+				transition: border $transition;
 			}
 		}
 	}
 	
 	.g-recaptcha {
 		filter: invert(1) hue-rotate(180deg) saturate(2.5);
-		transition: filter .2s ease-in-out;
+		transition: filter $transition;
 	}
 }
 
@@ -576,6 +578,7 @@ textarea:focus, input[type=text]:focus, button:focus {
 
 	.comment, .comment__new {
 		background: rgba(0, 0, 0, 0.1);
+		box-shadow: 5px 10px 18px #999;
 	}
 
 	button:not(:hover) {
@@ -616,10 +619,13 @@ pre.highlight, figure.highlight {
 	word-wrap: normal;
 	overflow: auto;
 	overflow-y: hidden;
-	transition: background .2s ease-in-out;
+	transition: background $transition, border $transition, box-shadow $transition;
 	
-	span[class] {
-		transition: all .2s ease-in-out;
+	.bp, .c, .c1, .cd, .cm, .cp, .cs, .err, .gd, .ge, .gh, .gi, .gl, .go, .gp, .gr, .gs, .gt, .gu,
+	.il, .k, .kc, .kd, .kn, .kp, .kr, .kt, .kv, .m, .mb, .mf, .mh, .mi, .mo, .mx,
+	.na, .nb, .nc, .nd, .ne, .nf, .nl, .nn, .no, .nt, .nv, .o, .ow, .p, .pi, .py,
+	.s, .s1, .s2, .sb, .sc, .sd, .se, .sh, .si, .sr, .ss, .sx, .vc, .vg, .vi, .w {
+		transition: color $transition, font-weight $transition;
 	}
 }
 
@@ -627,6 +633,7 @@ pre.highlight, figure.highlight {
 	pre.highlight, figure.highlight {
 		background-color: #fff;
 		border-color: rgba(0,0,0,0.15);
+		box-shadow: 5px 10px 18px #999;
 	}
 }
 
@@ -679,7 +686,7 @@ code.highlighter-rouge {
 		.sr { color: #75b5aa; }
 		.si, .se { color: #8f5536; }
 		.nf { color: #77bbdd; }
-		.nt, .nn, .nc, .no{ color: #f4bf75; }
+		.nt, .nn, .nc, .no { color: #f4bf75; }
 		.na { color: #6a9fb5; }
 		.m, .mf, .mh, .mi, .il, .mo, .mb, .mx { color: #90a959; }
 		.ss { color: #90a959; }
