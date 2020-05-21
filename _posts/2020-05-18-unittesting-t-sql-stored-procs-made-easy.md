@@ -12,7 +12,7 @@ Not wanting to make 3 or 4 copies of the same stored proc manually I dug around 
 
 I then realized that I might as well "deploy" a version called `MyStoredProc_UTST` where `_test_` gets replaced with `#unittest_`, which would allow me to insert exactly the scenario I wanted to test in these temporary tables. So I expanded on this idea and have since been using [`RunUnitTests`](https://github.com/asontu/PureSQLUnitTesting/blob/master/procs/RunUnitTests.sql) to test the my code for this client.
 
-And I figured there might be others that could use a small, pure T-SQL UnitTesting "framework" (I mean it's literally just two stored procedures, can I even call it a library?) so I gave it its own repo here on [GitHub](https://github.com/asontu/PureSQLUnitTesting).
+And I figured there might be others that could use a small, pure T-SQL UnitTesting "framework" (I mean it's literally just two stored procedures, can I even call it a framework?) so I gave it its own repo here on [GitHub](https://github.com/asontu/PureSQLUnitTesting).
 
 Ideas, feedback, bugs and PR's welcome, happy testing!
 
