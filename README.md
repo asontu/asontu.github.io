@@ -12,3 +12,4 @@ This repository exists to support [my blog](https://asontu.github.io/). If you'r
 *	Pure CSS collapsible based on [this article](https://alligator.io/css/collapsible/)
 *	Tag-filtered overviews based on [this article](https://longqian.me/2017/02/09/github-jekyll-tag/#4-display-the-tags-of-a-post)<br>
 	_(start at step 4 though, 1-3 are obvious or unnecessary)_
+*	RSS-feed thanks to [Dzhavat Ushev's article](https://dzhavat.github.io/2020/01/19/adding-an-rss-feed-to-github-pages.html)

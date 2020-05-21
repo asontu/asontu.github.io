@@ -59,7 +59,14 @@ header .container {
 }
 
 footer .container {
-	padding: 3px 10px;
+	padding: 3px 3em 3px 10px;
+	position: relative;
+	
+	.rss-link {
+		position: absolute;
+		right: 10px;
+		top: 3px;
+	}
 }
 
 section {

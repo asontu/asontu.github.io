@@ -20,6 +20,9 @@ paginate_path: "/:num/"
 
 google_analytics: UA-165352843-1
 
+plugins:
+  - jekyll-feed
+
 lsi: false
 safe: true
 source: 
