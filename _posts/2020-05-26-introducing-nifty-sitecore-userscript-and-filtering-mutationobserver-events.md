@@ -4,7 +4,7 @@ title: "Introducing nifty Sitecore userscript and filtering MutationObserver eve
 tags: sitecore front-end javascript
 ---
 
-Like I'm sure many developers, when I use the same tool a lot I start see posibilities for improvement to suite my workflow. So too with the Sitecore client. So to automate everything I find myself doing twice, _to the **Tampermobile!**_
+Like I'm sure many developers, when I use the same tool a lot I start see possibilities for improvement to suite my workflow. So too with the Sitecore client. So to automate everything I find myself doing twice, _to the **Tampermobile!**_
 
 It started because I was constantly working in the Content Editor of the wrong environment, adjusting a template on Test rather than Dev and not understanding why TDS won't see the changes. So a small userscript to give different environments different colors in the header was born. Then we started migration from Sitecore 8 to Sitecore 9 and I couldn't quickly see which was which, so features were added and little by little the script became quite extensive. A couple of colleagues have been using this script now too so it was time to put it online on GitHub as [Asontu's Sitecore nifties](https://github.com/asontu/Asontus-Sitecore-nifties).
 
