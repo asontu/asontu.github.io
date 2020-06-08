@@ -1,0 +1,268 @@
+---
+
+---
+<head>
+<!--
+  _  _ _   _____ _                _ 
+ | || (_) |_   _| |_  ___ _ _ ___| |
+ | __ | |   | | | ' \/ -_) '_/ -_)_|
+ |_||_|_|   |_| |_||_\___|_| \___(_)
+ 
+Snoopin' the source eh? And you would've gotten away with it if wasn't for this meddling comment!
+
+Seriously though, I wrote a blogpost about this Inspeckyll page if you're interested:
+
+https://asontu.github.io/2020/06/08/inspecting-jekyll-objects-for-github-pages.html
+-->
+	<title>Inspeckyll</title>
+	<script type="text/javascript">
+		var options = [];
+
+		var site = makeOption("site", "site", "{{ site | jsonify | uri_escape }}");
+		var posts = makeOption("posts", "site.posts", "{{ site.posts | jsonify | uri_escape }}");
+		var pages = makeOption("pages", "site.pages", "{{ site.pages | jsonify | uri_escape }}");
+		var docs = makeOption("docs", "site.documents", "{{ site.documents | jsonify | uri_escape }}");
+		var tags = makeOption("tags", "site.tags", "{{ site.tags | jsonify | uri_escape }}");
+
+		var tag = [];
+{%		assign i = 0
+%}{%	for tag in site.tags
+%}			tag[{{ i }}] = makeOption("tag {{ i }}", "site.tags[{{ tag[0] }}]", "{{ tag | jsonify | uri_escape }}");
+{%			assign i = i | plus: 1
+%}{%	endfor
+
+%}{%	assign years = site.posts | group_by_exp: 'post', 'post.date | date: "%Y"'
+%}		var years = makeOption("years", "site.posts grouped", "{{ years | jsonify | uri_escape }}");
+		
+
+		function makeOption(value, text, jsonStr) {
+			let opt = document.createElement('option');
+			opt.value = value;
+			opt.innerText = text;
+			options.push(opt);
+			return JSON.stringify(JSON.parse(decodeURIComponent(jsonStr)), null, '\t');
+		}
+	</script>
+	<style type="text/css">
+		.keyword  {
+			color: orange;
+			font-weight: bold;
+			text-shadow: 0 0 5px rgba(255,165,0,0.5);
+		}
+		.escchar  {
+			color: skyblue;
+			font-weight: bold;
+			text-shadow: 0 0 5px rgba(135,206,235,0.5);
+		}
+		.label    { 
+			color: lime;
+			font-weight: bold;
+			text-shadow: 0 0 5px rgba(0,255,0,0.5);
+		}
+		.datetime { color: yellow; }
+		.rgxlit   { color: yellow; }
+		.cmmnt    { color: lightgrey; font-style: italic; }
+		.strng    { color: limegreen; }
+		.numeral  { color: orange; }
+		
+		body {
+			font-family: monospace;
+			font-size: 13px;
+			margin: 0;
+			padding: 0;
+			white-space: nowrap;
+			tab-size: 4;
+			background: #000;
+			color: #fff;
+			position: relative;
+		}
+		* {
+			cursor: default;
+		}
+		select {
+			position: fixed;
+			top: 0;
+			right: 2em;
+			z-index: 3;
+		}
+		textarea {
+			font-family: monospace;
+			width: 100%;
+			height: 100%;
+			background: transparent;
+			color: #fff;
+			position: relative;
+			z-index: 2;
+			white-space: pre;
+			background: transparent;
+			color: transparent;
+			position: absolute;         
+			border: 0;
+			padding: 0;
+			margin: 0;
+			padding-left: 4em;
+			font-size: 13px;
+		}
+		#highlight-json {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			overflow: auto;
+			white-space: pre;
+			background: black;
+			color: white;
+			padding-left: 4em;
+			font-family: monospace;
+			font-size: 13px;
+			tab-size: 4;
+		}
+	</style>
+	<script type="text/javascript">
+		function $(id) {
+			return document.getElementById(id);
+		}
+		
+		// Define language keywords by category, the category name becomes the css-class the keyword will be wrapped in
+		var keyWords = {
+			'keyword':['false', 'null', 'true'],
+			'numeral':['\\d\\w*']
+		};
+
+		// Place language keywords in array as subsections of a regex, place categories in a cssClasses array with corresponding array-indexes to the keywords array
+		var cssClasses = [];
+		var rgxGroups = [];
+
+		for (var clss in keyWords) {
+			cssClasses.push(clss);
+			rgxGroups.push(
+				keyWords[clss].sort(
+					function(a, b){
+						return b.length - a.length;
+					})
+				.join('|'));
+		}
+
+		// Return hex-code based HTML-entity of input char, including surrogate pairs
+		function toEntity(m) {
+			var entityInt = m.charCodeAt(0);
+			if (m.length==2) {
+				// length of 2 means input char is represented in JavaScript with a surrogate pair
+				entityInt = parseInt(
+					m.charCodeAt(0).toString(2).substring(6) +
+					m.charCodeAt(1).toString(2).substring(6), 2) + 0x10000;
+			}
+			return '&#x'+entityInt.toString(16).toUpperCase()+';';
+		}
+
+		// String version of regex to match characters that need to be converted to HTML entities for displaying
+		var rgxEntity = '[\\uD800-\\uDFFF][\\uDC00-\\uDFFF]|' +     // Surrogate pairs
+						'[\\u007F-\\uD7FF\\uE000-\\uFFFD<>\\&]';    // other non-standard chars (127 and up, except Surrogate pair start, plus <>&)
+
+		// String version of regex to match anything that needs treatment, including above defined HTML entities chars and language keywords
+		var rgxLanguage = `(${rgxEntity})|` +                           // chars that need html entities
+			`(\\\/\\\/[^\\n]*|\\\/\\*(?:[^*]|\\*(?!\\\/))*\\*\\\/)|` +  // comments (both // and /* */ style)
+			'(`(?:[^`\\\\]|\\\\[\\s\\S])+`)|' +                         // template strings (``)
+			
+			`((['"])(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|` + // string that contains a Timestamp
+			`(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|` +
+			`(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|` +
+			`(?:[2468][048]|[13579][26])00)-02-29) ` +
+			`(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d ` +
+			`(?:Z|[+-][01]\\d[0-5]\\d)\\5)|` +
+			
+			`((['"])(?:(?!\\7|\\\\).|\\\\.|\\\\\\n)*\\7)(?!\\s*:)|` +   // strings (both '' and "") that aren't JSON-object keys
+			`(\\\/(?![*\/])(?:[^\\\\\/\\n]|\\\\.)+\\\/` +               // regex-literal
+			`([igm])?((?!\\9)[igm])?(?:(?!\\9|\\10)[igm])?)|` +         // non-repeatable igm part of regex
+			`(([\'"])(?:(?!\\12|\\\\).|\\\\.|\\\\\\n)*\\12|\\b(?!\\d)\\w+)(?=\\s*:)|` + // strings that are JSON-object keys
+			`\\b(${rgxGroups.join(')\\b|\\b(')})\\b`;                   // keywords as defined above, surrounded with \b word-boundary
+
+		console.log(rgxLanguage);
+
+		// Convert string versions of regexes into actual regex objects
+		rgxLanguage = new RegExp(rgxLanguage, 'gm');
+		rgxEntity = new RegExp(rgxEntity, 'g');
+
+		function highlight(sInput) {
+			var sReturnStart = '';
+			var sReturnEnd = '</span>';
+			var sOutput;
+			sOutput = sInput.replace(rgxLanguage,
+				function(m, entty, cmnt, tstrng, datetime, dtq, strng, quote, rgx, igm, mgi, label, lq, ...grps) {
+					var mStart = grps[grps.length-2];
+					switch (true) {
+						case entty != undefined:
+							var ret = toEntity(m);
+							return ret;
+						case rgx != undefined:
+							sReturnStart = '<span class="rgxlit">';
+						break;
+						case cmnt != undefined:
+							sReturnStart = '<span class="cmmnt">';
+						break;
+						case tstrng != undefined:
+						case strng != undefined:
+							sReturnStart = '<span class="strng">';
+						break;
+						case label != undefined:
+							sReturnStart = '<span class="label">';
+						break;
+						case datetime != undefined:
+							sReturnStart = '<span class="datetime">';
+						break;
+						default:
+							for (var n = 0; n < cssClasses.length; n++) {
+								if (grps[n] != undefined) {
+									sReturnStart = '<span class="' + cssClasses[n] + '">';
+									break;
+								}
+							}
+					}
+					m = m.replace(rgxEntity, function(ent, entStart) {
+						return toEntity(ent);
+					});
+					if (strng != undefined) {
+						m = m.replace(/\\(?:[bfnrt]|u[0-9a-f]{4})/g, function(esc, escStart) {
+							return '<span class="escchar">' + esc + sReturnEnd;
+						});
+					}
+					return sReturnStart + m + sReturnEnd;
+				}
+			) + '&nbsp;';
+			return sOutput;
+		}
+
+		// Set event handlers for one set of HTML elements
+		window.onload = function() {
+
+			options.forEach(function(o) {
+				$('select').appendChild(o);
+			});
+
+			showJson.apply($('select'));
+
+			$('jekyll-json').onscroll=function(e) {
+				$('highlight-json').scrollTop = this.scrollTop;
+				$('highlight-json').scrollLeft = this.scrollLeft;
+			}
+
+			function showJson() {
+				var val = this.value.split(/\s+/);
+				if (val.length == 1) {
+					$('jekyll-json').value = window[this.value];
+				} else {
+					$('jekyll-json').value = window[val[0]][val[1]];
+				}
+				$('highlight-json').innerHTML = highlight($('jekyll-json').value);
+			}
+			$('select').onchange = showJson;
+		}
+	</script>
+</head>
+
+<body>
+	<div id="highlight-json">&nbsp;</div>
+	<textarea id="jekyll-json" readonly></textarea>
+	<select id="select"></select>
+</body>
