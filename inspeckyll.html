@@ -175,7 +175,7 @@ https://asontu.github.io/2020/06/08/inspecting-jekyll-objects-for-github-pages.h
 			`((['"])(?:(?!\\7|\\\\).|\\\\.|\\\\\\n)*\\7)(?!\\s*:)|` +   // strings (both '' and "") that aren't JSON-object keys
 			`(\\\/(?![*\/])(?:[^\\\\\/\\n]|\\\\.)+\\\/` +               // regex-literal
 			`([igm])?((?!\\9)[igm])?(?:(?!\\9|\\10)[igm])?)|` +         // non-repeatable igm part of regex
-			`(([\'"])(?:(?!\\12|\\\\).|\\\\.|\\\\\\n)*\\12|\\b(?!\\d)\\w+)(?=\\s*:)|` + // strings that are JSON-object keys
+			`((['"])(?:(?!\\12|\\\\).|\\\\.|\\\\\\n)*\\12|\\b(?!\\d)\\w+)(?=\\s*:)|` + // strings that are JSON-object keys
 			`\\b(${rgxGroups.join(')\\b|\\b(')})\\b`;                   // keywords as defined above, surrounded with \b word-boundary
 
 		console.log(rgxLanguage);

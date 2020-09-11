@@ -18,11 +18,12 @@ max_font: 25
 
 %}{%	comment
 %}				Implement Y = (X-A)/(B-A) * (D-C) + C from https://stackoverflow.com/questions/345187/math-mapping-numbers
+				Start with 0.0 to make divisor a float (https://shopify.github.io/liquid/filters/divided_by/)
 {%		endcomment
 
 %}{%	assign divisor = 0.0 | plus: max_size | minus: min_size | at_least: 1.0
-%}{%	assign target_max_min = 0 | plus: page.max_font | minus: page.min_font
-	
+%}{%	assign target_max_min = page.max_font | minus: page.min_font
+
 %}{%	for tag in site.tags
 %}{%		assign font_size = tag[1].size | minus: min_size | divided_by: divisor | times: target_max_min | plus: page.min_font | round
 %}			<li><a href="/tags/{{ tag[0] | replace: '#', '-sharp' }}" style="font-size: {{ font_size }}px">{{ tag[0] | capitalize }}</a></li>
