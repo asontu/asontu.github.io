@@ -18,6 +18,21 @@ layout: default
 {%		endcapture
 %}		{{ tags_html | normalize_whitespace | replace: ' - </small>', '</small>' }}
 {%	endif
+%}
+{%	if page.previous or page.next
+%}		<div class="pagination">
+{%			if page.next
+%}				<a href="{{ page.next.url }}" class="previous" title="{{ page.next.title }}"></a>
+{%			else
+%}				<span class="previous"></span>
+{%			endif
+%}{%		if page.previous
+%}				<a href="{{ page.previous.url }}" class="next" title="{{ page.previous.title }}"></a>
+{%			else
+%}				<span class="next"></span>
+{%			endif
+%}		</div>
+{%	endif
 %}</section>
 
 {% include comments.html %}
