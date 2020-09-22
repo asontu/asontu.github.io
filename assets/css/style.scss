@@ -240,6 +240,7 @@ div.highlight pre, textarea {
 }
 
 .pagination {
+	position: relative;
 	text-align: center;
 	margin-top: 1em;
 	
@@ -320,6 +321,51 @@ div.highlight pre, textarea {
 		&::before, &::after {
 			border-left-color: #666 !important;
 			border-right-color: #666 !important;
+		}
+	}
+	
+	div.excerpt {
+		position: absolute;
+		max-height: 0;
+		max-width: 0;
+		overflow: hidden;
+		padding: 0;
+		background: rgba(0,0,0,0.8);
+		border-radius: 20px;
+		text-align: left;
+		white-space: pre-wrap;
+		
+		&::before {
+			color: $theme-color;
+			font-weight: bold;
+		}
+	}
+	
+	a:hover ~ div.excerpt {
+		max-height: 250px;
+		max-width: 100%;
+		padding: 10px;
+	}
+	
+	a.next:hover ~ div.excerpt {
+		
+		&::before {
+			content: attr(data-next-title) "\a\a";
+		}
+		
+		&::after {
+			content: attr(data-next-excerpt);
+		}
+	}
+	
+	a.previous:hover ~ div.excerpt {
+		
+		&::before {
+			content: attr(data-prev-title) "\a\a";
+		}
+		
+		&::after {
+			content: attr(data-prev-excerpt);
 		}
 	}
 }
@@ -507,6 +553,14 @@ textarea:focus, input[type=text]:focus, button:focus {
 				transition: border $transition;
 			}
 		}
+		
+		div.excerpt {
+			transition: max-height $transition, padding $transition, background $transition, box-shadow $transition;
+			
+			&::before {
+				transition: color $transition;
+			}
+		}
 	}
 	
 	.g-recaptcha {
@@ -593,6 +647,15 @@ textarea:focus, input[type=text]:focus, button:focus {
 			&::before, &::after {
 				border-left-color: #aaa !important;
 				border-right-color: #aaa !important;
+			}
+		}
+	
+		div.excerpt {
+			background: rgba(229, 229, 229, 1);
+			box-shadow: 5px 10px 18px #999;
+			
+			&::before {
+				color: $invert-theme-color;
 			}
 		}
 	}

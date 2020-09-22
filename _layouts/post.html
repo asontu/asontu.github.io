@@ -31,7 +31,15 @@ layout: default
 {%			else
 %}				<span class="next"></span>
 {%			endif
-%}		</div>
+%}			<div class="excerpt"{%
+			if page.previous %}
+				data-next-title="{{ page.previous.title | escape | strip }}" data-next-excerpt="{{ page.previous.excerpt | strip_html | escape | strip }}"{%
+			endif
+%}{%		if page.next %}
+				data-prev-title="{{ page.next.title | escape | strip }}" data-prev-excerpt="{{ page.next.excerpt | strip_html | escape | strip }}"{%
+			endif
+%}></div>
+		</div>
 {%	endif
 %}</section>
 
