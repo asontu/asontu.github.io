@@ -14,6 +14,8 @@ A full list of features is listed in the [GitHub README](https://github.com/ason
 
 The implementation of this feature proved a bit of a challenge, as every click in the Content Tree triggers an XHR call in the background and multiple DOM tree mutations. Attaching a `MutationObserver` triggered the callback function a few times before the element of interest was actually added. Unfortunately `MutationObserver.observe()` doesn't have a filter option and [it doesn't look like this'll come in the future](https://github.com/whatwg/dom/issues/77#issuecomment-372568780) so I implemented this filtering function that I use in the callback to return if no elements matching a query are found.
 
+_**Update:** the function below has since this post also been used in a MutationObserver Promise implementation discussed [here](/2020/12/30/mutationobserver-promise-made-easy.html)._
+
 {% highlight js linenos %}
 function searchMutationListFor(mutationList, query) {
 	if (!mutationList.length) {
