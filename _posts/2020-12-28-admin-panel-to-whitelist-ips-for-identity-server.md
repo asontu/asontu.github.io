@@ -8,7 +8,9 @@ One of our clients wanted to be sure that only white-listed IP's can log into Si
 
 For this page to work, `Microsoft.Web.Administration.dll` needs to be available on the site. It's available from NuGet. Also, as mentioned in the code, the App Pool needs read/write access to all files in `%SystemRoot%\System32\inetsrv\config` as well as the `web.config` of the site of which the white-listed IP's need to be managed, i.e. the relevant Identity Server. Finally you need to put the IIS name of the site of interest as the constant `siteOfInterest`.
 
-**Update:** As I was deploying this I ran into another setting that needs tweaking. IIS needs to allow write delegation on the IP Address and Domain Restrictions feature for the relevant (Identity Server) site. Go to the root of IIS and open _Feature Delegation_:
+**Update 2:** I've tweaked the admin page to look better on mobile and accept IPv6 as it turns out [IIS actually accepts IPv6 addresses](https://stackoverflow.com/a/18834537/2684660) on the back-end, the UI was just never updated for this.
+
+**Update 1:** As I was deploying this I ran into another setting that needs tweaking. IIS needs to allow write delegation on the IP Address and Domain Restrictions feature for the relevant (Identity Server) site. Go to the root of IIS and open _Feature Delegation_:
 
 ![Feature Delegation in IIS](/assets/{{page.slug}}/step-1.png)
 
@@ -34,7 +36,7 @@ Then select the Sitecore Identity Server up top, select _IP Address and Domain R
 <script runat="server" language="c#">
     // For this administration page to work, IIS needs to be configured to allow Read/Write
     // delegation of the IP Address and Domain Restrictions feature on the Site of Interest
-	// (overrideMode="Allow" for system.webServer/security/ipSecurity)
+    // (overrideMode="Allow" for system.webServer/security/ipSecurity)
     // And the user this page runs under (App Pool) must have read/write access to both:
     // - %SystemRoot%\System32\inetsrv\config of the webserver
     // - web.config of the Site of Interest
@@ -121,15 +123,35 @@ Then select the Sitecore Identity Server up top, select _IP Address and Domain R
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-	<title>Manage white-listed IP's</title>
-	<link rel="Stylesheet" type="text/css" href="../default.css" />
-	<link rel="Stylesheet" type="text/css" href="/sitecore/shell/themes/standard/default/WebFramework.css" />
+    <title>Manage white-listed IP's</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="Stylesheet" type="text/css" href="../default.css" />
+    <link rel="Stylesheet" type="text/css" href="/sitecore/shell/themes/standard/default/WebFramework.css" />
+    <style type="text/css">
+        body {
+            font-size: 16px !important;
+            background-attachment: fixed;
+        }
+        
+        form.wf-container {
+            width: auto;
+            max-width: 860px;
+        }
+        
+        .wf-content {
+            padding: 1em !important;
+        }
+        
+        h1 {
+            padding: 1em 0 !important;
+        }
+    </style>
 </head>
 <body>
-	<form id="form1" runat="server" class="wf-container">
-		<div class="wf-content">
-			<h1>Manage white-listed IP's</h1>
-			<table cellspacing="1" cellpadding="1" border="1">
+    <form id="form1" runat="server" class="wf-container">
+        <div class="wf-content">
+            <h1>Manage white-listed IP's</h1>
+            <table cellspacing="1" cellpadding="1" border="1">
                 <tr>
                     <th>IP address</th>
                     <th>&nbsp;</th>
@@ -156,10 +178,11 @@ Then select the Sitecore Identity Server up top, select _IP Address and Domain R
                 </tr>
             </table>
             <asp:RegularExpressionValidator ID="RegularExpressionValidatorIp" runat="server"
-                ErrorMessage="Invalid IP Address!" ValidationExpression="^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?:\.|$)){4}"
+                ErrorMessage="Invalid IP Address!"
+                ValidationExpression="^(?!$)(?!.*?::.*?::)(?!.*?::.*?:$)(?!(?:[\da-fA-F]{1,4}(?::|$)){1,7}$)(?!(?:[\da-fA-F]{1,4}:){8})(?!:?(?::[\da-fA-F]{1,4}){8})(?!(?:[\da-fA-F]{1,4}:){7,}(?:\d+(?:\.|$)){4})(?!(?:[\da-fA-F]{1,4}:){6,}:(?:\d+(?:\.|$)){4})(?!(?:[\da-fA-F]{0,4}:){8,}(?:\d+(?:\.|$)){4})(?!(?:[\da-fA-F]{1,4}:){1,5}(?:\d+(?:\.|$)){4})(?:(?:::)?(?:[\da-fA-F]{1,4}(?:::?|$)){0,8})?(?:(?:(?:25[0-5]|2[0-4][0-9]|(?!00)1?[0-9][0-9]?)(?:\.|$)){4})?$"
                 ControlToValidate="txtValue"></asp:RegularExpressionValidator>
-		</div>
-	</form>
+        </div>
+    </form>
 </body>
 </html>
 {% endhighlight %}
