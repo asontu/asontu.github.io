@@ -87,29 +87,37 @@ queryable = desc
 	: Queryable.OrderBy(queryable, OrderFunctions[orderByField]);
 {% endhighlight %}
 
-Et voilà, from 34 lines of unreadable spaghetti to 10 lines of easily maintained and extendable code. Admittedly, the `Expression<Func<SearchResultItem, ` part is a bit lengthy and repetitive. Unfortunately `Expression<>` is a `sealed` class, but you can make a wrapper for it. The end result then looks like this:
+Et voilà, from 34 lines of unreadable spaghetti to 10 lines of easily maintained and extendable code. This works, but the `Expression<Func<SearchResultItem, ` part is a bit lengthy and repetitive. Unfortunately `Expression<>` is a `sealed` class, but you can make a wrapper for it. This wrapper has the actual `Expression<Func<>>` as a property, and I like to make an interface that defines the property, so you could have multiple implementations like `OrderSitecoreBy<T>` and `OrderSqlBy<T>` based on their input-type (`SearchResultItem` in our case). As well this allows the `Dictionary<>` to return type `IOrderBy` rather than `dynamic`. The end result then looks like this:
 
 {% highlight c# linenos %}
-namespace My.Projects.Namespace
+// IOrderBy.cs
+
+public interface IOrderBy
 {
-    using System;
-    using System.Linq.Expressions;
-
-    public class OrderBy<T>
-    {
-        public OrderBy(Expression<Func<SearchResultItem, T>> expression)
-        {
-            this.Expression = expression;
-        }
-
-        public Expression<Func<SearchResultItem, T>> Expression { get; }
-    }
+	dynamic Expression { get; }
 }
 
-// ...
+// OrderBy.cs
 
-private static readonly Dictionary<string, dynamic> OrderFunctions =
-	new Dictionary<string, dynamic>
+using System;
+using System.Linq.Expressions;
+
+public class OrderBy<T> : IOrderBy
+{
+	private readonly Expression<Func<SearchResultItem, T>> expression;
+	
+	public OrderBy(Expression<Func<SearchResultItem, T>> expression)
+	{
+		this.expression = expression;
+	}
+
+	public dynamic Expression => this.expression;
+}
+
+// Code that needs mapping from string to ordering-expression.
+
+private static readonly Dictionary<string, IOrderBy> OrderFunctions =
+	new Dictionary<string, IOrderBy>
 	{
 		{ "hired", new OrderBy<DateTime>(x => x.DateHired) },
 		{ "name",  new OrderBy<string>(x => x.Name) },
@@ -123,4 +131,4 @@ queryable = desc
 	: Queryable.OrderBy(queryable, OrderFunctions[orderByField].Expression);
 {% endhighlight %}
 
-And the nice thing is you can pass the `dynamic` expression trees around like variables. The logic behind a sort-column like `"hired"` could be kept in a completely different assembly or namespace to keep a good separation of concerns.
+And the nice thing is you can pass the `IOrderBy` expression trees around like variables. The logic behind a sort-column like `"hired"` could be kept in a completely different assembly or namespace to keep a good separation of concerns.
