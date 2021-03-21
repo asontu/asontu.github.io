@@ -1,0 +1,628 @@
+<head>
+	<title>Asontu's Macro-tool</title>
+	<style type="text/css">
+		body, table, tr, td {
+			font-family:monospace;
+			font-size:10pt;
+			margin:0;
+			padding:0;
+			white-space:nowrap;
+			tab-size:4;
+		}
+		body, table, tr, td {
+			background:#000;
+			color:#fff;
+		}
+		* {
+			cursor:default;
+		}
+		td {
+			position:relative;
+		}
+		#countInFrom, #countInTo, #countOutFrom, #countOutTo {
+			position:absolute;
+			bottom:2em;
+			right:2em;
+			background:#000;
+			color:#666;
+			text-align:right;
+			z-index:1;
+		}
+		textarea {
+			font-family:monospace;
+			width:100%;
+			height:100%;
+			background:transparent;
+			color:#fff;
+			position:relative;
+			z-index:2;
+		}
+		.cont {
+			position:relative;
+			width:100%;
+			height:100% !important;
+		}
+		#fnFrom, #fnTo {
+			background:transparent;
+			color:transparent;
+			position:absolute;			
+			border:0;
+			padding:0;
+			margin:0;
+			padding-left:4em;
+		/*	overflow:scroll;*/
+			font-family:monospace; /* "Segoe UI Symbol" */
+			font-size:10pt;
+		}
+		#viewFrom, #viewTo {
+			position:absolute;
+			top:0;
+			left:0;
+			right:0;
+			bottom:0;
+			overflow:auto;
+			white-space:pre;
+			background:black;
+			color:white;
+			padding-left:4em;
+			font-family:monospace; /* "Segoe UI Symbol" */
+			font-size:10pt;
+			tab-size:4;
+		}
+		@keyframes caretBlink {
+			0%  { opacity:1; }
+			49% { opacity:1; }
+			50% { opacity:0; }
+			99% { opacity:0; }
+		}
+		#caretFrom, #caretTo {
+			position:absolute;
+		}
+		.blinker {
+			position:relative;
+			top:1px;
+			left:-3px;
+			color:white;
+		/*	background:white; */
+			animation-name: caretBlink;
+			animation-duration: 1s;
+			animation-iteration-count: infinite;
+		}
+		.blinker:before {
+			content:"\2502";
+		}
+		
+		.language { color:orange; }
+		.func     { color:skyblue; }
+		.object   { color:red; }
+		.rgxlit   { color:yellow; }
+		.cmmnt    { color:lightgrey;font-style:italic; }
+		.strng    { color:limegreen; }
+		.numeral  { color:orange; }
+		
+		input, select {
+			background:#222;
+			color:#fff;
+			border:0;
+			font-family:monospace;
+		}
+		input[type=checkbox] {
+			vertical-align:middle;
+		}
+		input[type=radio] {
+			vertical-align:text-bottom;
+		}
+		pre {
+			margin:0;
+			padding:0;
+		}
+		a {
+			color:#fff;
+		}
+	</style>
+	<script type="text/javascript" src="text.js"></script>
+	<script type="text/javascript">
+		var fns = ['',
+`return row.replace(/(^[\\d\\W]+)|(\\W+$)/ig, '')
+	.toLowerCase() // delToKEEPUpperCase
+	.replace(/\\W+\\w/ig, function(m) {
+		return m.charAt(m.length-1).toUpperCase();
+	}
+);`,
+`return row.replace(/(^[\\d\\W]+)|(\\W+$)/ig, '')
+	.toLowerCase() // DelToKEEPUpperCase
+	.replace(/^\\w|\\W+\\w/ig, function(m) {
+		return m.charAt(m.length-1).toUpperCase();
+	}
+);`,
+`return row.replace(/(^[\\d\\W]+)|(\\W+$)/ig, '')
+	.toLowerCase() // del_to_KEEP_upper_case
+	.replace(/\\W+/ig, '_');`,
+`return row.match(/[A-Z_]\\w*/i)?row.match(/[A-Z_]\\w*/i)[0]:'';`,
+`return row.replace(/\\b[A-Z_]{2,}\\b/g, function(m) {
+	return m.toLowerCase();
+});`,
+`var r = row.split(' as ');
+return '"' + r[1].replace(/[[\\]",]/g, '') + '" = ' + r[0].trim();`,
+`var n = (i+1);
+var lastCharNum = n%26;
+if (lastCharNum == 0) lastCharNum = 26;
+var colCode = ((n>26)?String.fromCharCode((n - lastCharNum)/26 + 64):'') +
+		String.fromCharCode(lastCharNum + 64);
+return '.value(\\'@col' + (i+1) + '\\', \\'varchar(max)\\') ' +
+	row.replace(/(^[\\d\\W]+)|(\\W+$)/ig, '')
+	.toLowerCase() // DelToKEEPUpperCase
+	.replace(/^\\w|\\W+\\w/ig, function(m) {
+		return m.charAt(m.length-1).toUpperCase();
+	}) + '\\t-- ' + colCode;`,
+`var ret = '-- ';
+row = row.toLowerCase().replace(/[^a-z0-9 .()[\\]<>\\/\\\\'"|!?@#=_+-]/g,` + /* fix highlight ' */ ` '');
+var l = row.length;
+for (var o = 0; o < 5; o++) {
+	for (var n = 0; n < l; n++) {
+		ret += ((row.charAt(n)==' ')?' ':ls[row.charAt(n)][o]) +
+			((n<l-1)?kerning(row.charAt(n), row.charAt(n+1)):'');
+	}
+	ret = ret.trim() + '\\n-- ';
+}
+return ret.replace(/[\\s\\r\\n-]+$/g, '') + '\\n';`,
+`var chars = ['='];
+var prevCharIndex = 0;
+r = row.split('\\n');
+for (var c = 0; c < chars.length; c++) {
+	var maxIndex = 0;
+	for (var i = 0; i < r.length; i++) {
+		maxIndex = Math.max(maxIndex, r[i].indexOf(chars[c], prevCharIndex));
+	}
+	for (var i = 0; i < r.length; i++) {
+		var indexI = r[i].indexOf(chars[c], prevCharIndex);
+		if (indexI > -1) {
+			r[i] = r[i].substring(0, indexI) + ' '.repeat(maxIndex - indexI) + r[i].substring(indexI);
+		}
+	}
+	prevCharIndex = maxIndex + chars[c].length;
+}
+return r.join('\\n');`,
+`var sep = ';';
+var newSep = sep;
+var map = row.trim().split('\\n').map(o => o.split(sep));
+var ret = '';
+for (var c = 0; c < map[0].length; c++) {
+	for (var r = 0; r < map.length; r++) {
+		ret += map[r][c] + newSep;
+	}
+	ret = ret.substring(0, ret.length-newSep.length) + '\\n';
+}
+return ret;`];
+		var lastFn = {
+			'From':0,
+			'To':0
+		};
+		var other = {
+			'From':'To',
+			'To':'From'
+		}
+		function $(id) {
+			return document.getElementById(id);
+		}
+		
+		// Define language keywords by category, the category name becomes the css-class the keyword will be wrapped in
+		var keyWords = {
+			'object':['Object', 'String', 'Math', 'Number', 'Boolean', 'Array', 'RegExp', 'Function', 'Date'],
+			'language':['break', 'case', 'catch', 'default', 'delete', 'do', 'else', 'false', 'finally', 'for', 'function', 'if', 'in',
+				'new', 'null', 'return', 'self', 'switch', 'this', 'throw', 'true', 'try', 'typeof', 'undefined', 'var', 'while', 'with'],
+			'func':['abs', 'alert', 'ceil', 'charAt', 'charCodeAt', 'concat', 'confirm', 'cos', 'eval', 'exec', 'floor', 'fromCharCode',
+				'getDate', 'getDay', 'getFullYear', 'getHours', 'getMilliseconds', 'getMinutes', 'getMonth', 'getSeconds', 'getTime',
+				'indexOf', 'isArray', 'isNaN', 'join', 'lastIndexOf', 'log', 'match', 'max', 'min', 'parseFloat', 'parseInt', 'pop', 'pow', 'preventDefault', 'prompt', 'push',
+				'random', 'replace', 'reverse', 'round', 'search', 'shift', 'sin', 'slice', 'sort', 'splice', 'split', 'sqrt', 'stopPropagation', 'substr', 'substring', 'test',
+				'toExponential', 'toFixed', 'toLowerCase', 'toPrecision', 'toString', 'toUpperCase', 'trim', 'unshift', 'valueOf'],
+			// DOM API: ['getElementById', 'write'],
+			'numeral':['\\d\\w*']
+		};
+
+		// Place language keywords in array as subsections of a regex, place categories in a cssClasses array with corresponding array-indexes to the keywords array
+		var cssClasses = [];
+		var rgxGroups = [];
+
+		for (var clss in keyWords) {
+			cssClasses.push(clss);
+			rgxGroups.push(
+				keyWords[clss].sort(
+					function(a, b){
+						return b.length - a.length;
+					})
+				.join('|'));
+		}
+
+		// Return hex-code based HTML-entity of input char, including surrogate pairs
+		function toEntity(m) {
+			var entityInt = m.charCodeAt(0);
+			if (m.length==2) {
+				// length of 2 means input char is represented in JavaScript with a surrogate pair
+				entityInt = parseInt(
+					m.charCodeAt(0).toString(2).substring(6) +
+					m.charCodeAt(1).toString(2).substring(6), 2) + 0x10000;
+			}
+			return '&#x'+entityInt.toString(16).toUpperCase()+';';
+		}
+
+		// Regex literal:
+		// ([\uD800-\uDFFF][\uDC00-\uDFFF]|[\u007F-\uD7FF\uE000-\uFFFD<>\&])|
+		// (\/\/[^\n]*|\/\*(?:[^*]|\*(?!\/))*\*\/)|
+		// (`(?:[^`\\]|\\[\s\S])+`)|
+		// ((['"])(?:(?!\5|\\).|\\.|\\\n)*\5)|
+		// (\/(?![*/])(?:[^\\/\n]|\\.)+\/
+		// ([igm])?((?!\2)[igm])?((?!\2|\3)[igm])?)
+
+		// String version of regex to match characters that need to be converted to HTML entities for displaying
+		var rgxEntity = '[\\uD800-\\uDFFF][\\uDC00-\\uDFFF]|' +		// Surrogate pairs
+						'[\\u007F-\\uD7FF\\uE000-\\uFFFD<>\\&]';	// other non-standard chars (127 and up, except Surrogate pair start, plus <>&)
+
+		// String version of regex to match anything that needs treatment, including above defined HTML entities chars and language keywords
+		var rgxLanguage = '(' + rgxEntity + ')|' +								// chars that need html entities
+					'(\\\/\\\/[^\\n]*|\\\/\\*(?:[^*]|\\*(?!\\\/))*\\*\\\/)|' +	// comments (both // and /* */ style)
+					'(`(?:[^`\\\\]|\\\\[\\s\\S])+`)|' +							// template strings (``)
+					'(([\'"])(?:(?!\\5|\\\\).|\\\\.|\\\\\\n)*\\5)|' +			// strings (both '' and "")
+					'(\\\/(?![*\/])(?:[^\\\\\/\\n]|\\\\.)+\\\/' +				// regex-literal
+					'([igm])?((?!\\7)[igm])?(?:(?!\\7|\\8)[igm])?)|' +			// non-repeatable igm part of regex
+					'\\b('+ rgxGroups.join(')\\b|\\b(') + ')\\b';				// keywords as defined above, surrounded with \b word-boundary
+		
+		console.log(rgxLanguage);
+
+		// Convert string versions of regexes into actual regex objects
+		rgxLanguage = new RegExp(rgxLanguage, 'gm');
+		rgxEntity = new RegExp(rgxEntity, 'g');
+
+		// Set event handlers for one set of HTML elements
+		function set(which) {
+			$('fn'+which).oninput=
+			$('fn'+which).onkeyup=
+			$('fn'+which).onclick=function(e) {
+				var bCaret = false;
+				var iCaretPos = this.selectionStart;
+				var iAdd2Caret = 0;
+				var sReturnStart = '';
+				var sReturnEnd = '</span>';
+				var sOutput;
+				if (this.selectionStart == this.selectionEnd && this === document.activeElement) {
+					bCaret = true;
+				}
+				sOutput = this.value.replace(rgxLanguage,
+					function(m, entty, cmnt, tstrng, strng, quote, rgx, igm, mgi, ...grps) {
+						var mStart = grps[grps.length-2];
+						switch (true) {
+							case entty != undefined:
+								var ret = toEntity(m);
+								if (bCaret && mStart < iCaretPos) {
+									iAdd2Caret += ret.length - m.length;
+								}
+								return ret;
+							case rgx != undefined:
+								sReturnStart = '<span class="rgxlit">';
+							break;
+							case cmnt != undefined:
+								sReturnStart = '<span class="cmmnt">';
+							break;
+							case tstrng != undefined:
+							case strng != undefined:
+								sReturnStart = '<span class="strng">';
+							break;
+							default:
+								for (var n = 0; n < cssClasses.length; n++) {
+									if (grps[n] != undefined) {
+										sReturnStart = '<span class="' + cssClasses[n] + '">';
+										break;
+									}
+								}
+						}
+						if (bCaret && mStart < iCaretPos) {
+							if (mStart + m.length < iCaretPos) {
+								iAdd2Caret += sReturnEnd.length;
+							}
+							iAdd2Caret += sReturnStart.length;
+						}
+						m = m.replace(rgxEntity, function(ent, entStart) {
+							var entRet = toEntity(ent);
+							if (mStart + entStart < iCaretPos) {
+								iAdd2Caret += entRet.length - ent.length;
+							}
+							return entRet;
+						});
+						return sReturnStart + m + sReturnEnd;
+					}
+				) + '&nbsp;';
+				if (bCaret) {
+					iCaretPos += iAdd2Caret;
+					sOutput = sOutput.substring(0, iCaretPos) +
+							'<span id="caret' + which + '"><span class="blinker"></span></span>' +
+							sOutput.substring(iCaretPos);
+				}
+				$('view'+which).innerHTML = sOutput;
+			}
+			$('fn'+which).onblur=function(e) {
+				if ($('caret'+which))
+					$('caret'+which).style.display='none';
+			}
+			$('fn'+which).onscroll=function(e) {
+				$('view'+which).scrollTop = this.scrollTop;
+				$('view'+which).scrollLeft = this.scrollLeft;
+			}
+			$('fn'+which).onchange=function() {
+				$('doFn'+which).checked = (this.value.trim()!='');
+			}
+			$('in'+which).onkeydown =
+			$('fn'+which).onkeydown =
+			$('row'+which).onkeydown =
+			$('sep'+which).onkeydown =
+			$('rowModi'+which).onkeydown =
+			$('rowRegex'+which).onkeydown = function(e) {
+			//	console.log(e.keyCode);
+/* Enter */		if (e.keyCode == 13) {
+					if (e.ctrlKey) {
+						if (e.target == $('fn'+which)) {
+							$('doFn'+which).checked=true;
+						}
+						$('go'+which).click();
+						e.preventDefault();
+						e.stopPropagation();
+					} else if (this.selectionStart == this.selectionEnd) {
+						var iStart = this.selectionStart;
+						var sLine = this.value.substring(this.value.lastIndexOf('\n', iStart-1) + 1, iStart);
+						var sTabs = sLine.match(/^[\n\r]*(\t*)/)[1];
+						if (sLine.charAt(sLine.length-1) == '{') {
+							sTabs += '\t';
+						}
+						this.value = this.value.substring(0, iStart) + '\n' + sTabs + this.value.substring(iStart);
+						this.selectionStart = this.selectionEnd = iStart + sTabs.length + 1;
+						e.preventDefault();
+						e.stopPropagation();
+					}
+				}
+/* } */			if (e.keyCode == 221 && e.shiftKey && this.selectionStart == this.selectionEnd) {
+					var iStart = this.selectionStart;
+					var sLine = this.value.substring(this.value.lastIndexOf('\n', iStart-1) + 1, iStart);
+					var sTabs = sLine.match(/^[\n\r]*(\t+)$/);
+					if (sTabs) {
+						this.value = this.value.substring(0, iStart-1) + '}' + this.value.substring(iStart);
+						this.selectionStart = this.selectionEnd = iStart;
+						e.preventDefault();
+						e.stopPropagation();
+					}
+				}
+/* Tab */		if (e.keyCode == 9 && e.target != $('row'+which) && e.target != $('rowRegex'+which) && e.target != $('rowModi'+which) && (e.target != $('sep'+which) || !e.shiftKey)) { 
+					e.preventDefault();
+					e.stopPropagation();
+					var iStart = this.selectionStart;
+					var iEnd = this.selectionEnd;
+					if (this.value.substring(iStart, iEnd).indexOf('\n') == -1 && !e.shiftKey) {
+						this.value = this.value.substring(0, iStart) + '\t' + this.value.substring(iEnd);
+						this.selectionStart = this.selectionEnd = iStart + 1;
+					} else {
+						var iLineStart = this.value.lastIndexOf('\n', iStart-1) + 1;
+						var sToTab = this.value.substring(iLineStart, iEnd);
+						if (!e.shiftKey) {
+							this.value = this.value.substring(0, iLineStart) + sToTab.replace(/^(?=.)/gm, '\t') + this.value.substring(iEnd);
+							this.selectionStart = iStart + 1;
+							this.selectionEnd = iEnd + sToTab.split(/^(?=.)/gm).length;
+						} else {
+							this.value = this.value.substring(0, iLineStart) + sToTab.replace(/^\t/gm, '') + this.value.substring(iEnd);
+							this.selectionStart = (iLineStart<iStart)?iStart - (sToTab.split(/\n\t/gm)[0].split(/^\t/gm).length - 1):iStart;
+							this.selectionEnd	=	iEnd - (sToTab.split(/^\t/gm).length - 1);
+						}
+					}
+				}
+/* Esc */		if (e.keyCode == 27 && e.target != $('fn'+which)) {
+					$('doFn'+which).checked=false;
+				}
+			}
+			$('in'+which).oninput =
+			$('split'+which).onchange = 
+			$('match'+which).onchange =
+			$('rowRegex'+which).onchange = function() {
+				var rowRegex = new RegExp($('rowRegex'+which).value, $('rowModi'+which).value);
+				$('countIn'+which).value = $('split'+which).checked?
+					$('in'+which).value.trim().split(rowRegex).length:
+					$('in'+which).value.match(rowRegex).length;
+			}
+			$('selFn'+which).onchange=function() {
+				if (lastFn[which] == 0 && $('fn'+which).value.trim()!='') {
+					fns[0] = $('fn'+which).value;
+				}
+				lastFn[which] = parseInt($('selFn'+which).value)
+				$('fn'+which).value=fns[lastFn[which]];
+				$('doFn'+which).checked=true;
+				$('fn'+which).click();
+			}
+			$('go'+which).onclick=function() {
+				var tabs = '';
+				for (var t = 0; t < $('tab'+which).value; t++) {
+					tabs += '\t';
+				}
+				var iEmpty = 0;
+				try {
+					var rowRegex = new RegExp($('rowRegex'+which).value, $('rowModi'+which).value);
+					var aFields = [];
+					if ($('split'+which).checked) {
+						aFields = $('in'+which).value.replace(/^\s*\n|\s+$/gi, '').split(rowRegex);
+					} else {
+						aFields = $('in'+which).value.match(rowRegex);
+					}
+				} catch (err) {
+					$('out'+which).value = err.name + ':\n\n' + err.message
+					return;
+				}
+				if ($('fn'+which).value.trim()=='') {
+					$('doFn'+which).checked=false;
+				}
+				for (var i = 0; i < aFields.length; i++) {
+					if (aFields[i].trim()=='') {
+						if ($('delWhite'+which).checked) {
+							aFields.splice(i--, 1);
+						} else {
+							aFields[i] = '~^~';
+						}
+						continue;
+					}
+					if ($('doFn'+which).checked) {
+						try {
+							var fn = new Function('row', 'i', $('fn'+which).value);
+							aFields[i] = fn(aFields[i], i);
+						} catch (err) {
+							$('out'+which).value =
+									err.name + ':\n\n' + err.message +
+									'\n\nOccurred first at row ' + i +
+									' with value:\n\n' + aFields[i];
+							return;
+						}
+					}
+					if (aFields[i]==='') {
+						if ($('delEmpty'+which).checked) {
+							aFields.splice(i--, 1);
+							continue;
+						} // else
+						aFields[i] = 'Empty';
+					}
+					if (aFields.slice(0, i).indexOf($('row'+which).value.replace(/~/g, aFields[i].replace(/\{num\}/g, ''))) != -1) {
+						if ($('delDouble'+which).checked) {
+							aFields.splice(i--, 1);
+							continue;
+						} // else
+						if ($('numDouble'+which).checked) {
+							var iDouble = 1;
+							if (aFields[i].indexOf('{num}') != -1) {
+								while (aFields.slice(0, i).indexOf($('row'+which).value.replace(/~/g, aFields[i].replace(/\{num\}/g, ''+(++iDouble)))) != -1);
+								aFields[i] = aFields[i].replace(/\{num\}/g, '' + iDouble);
+							} else {
+								while (aFields.slice(0, i).indexOf($('row'+which).value.replace(/~/g, aFields[i] + '' + (++iDouble))) != -1);
+								aFields[i] += '' + iDouble;
+							}
+						}
+					}
+					aFields[i] = $('row'+which).value.replace(/~/g, aFields[i].replace(/\{num\}/g, ''));
+				}
+				if ($('sort'+which).checked) {
+					if ($('customSort'+which).checked) {
+						try {
+							var sortFn = new Function('a', 'b', $('fn'+other[which]).value);
+							aFields.sort(sortFn);
+						} catch (err) {
+							$('out'+which).value =
+									err.name + ':\n\n' + err.message +
+									'\n\nOccurred while sorting with custom function';
+							return;
+						}
+					} else {
+						aFields.sort();
+					}
+				}
+				if ($('reverse'+which).checked) {
+					aFields.reverse();
+				}
+				$('out'+which).value = (tabs + aFields.join($('sep'+which).value + ($('ln'+which).checked?'\n':'') + tabs))
+					.replace(new RegExp(tabs + '~\\^~(?:' + $('sep'+which).value.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '|$)', 'g'), '');
+				$('countOut'+which).value = aFields.length;
+			}
+		}
+		window.onload = function() {
+			set('From');
+			set('To');
+		}
+	</script>
+</head>
+
+<body>
+<table width="100%" height="100%">
+	<tr height="33%">
+		<td colspan="2" width="50%"><input type="text" id="countInFrom" size="10" value="1" readonly /><textarea id="inFrom" wrap="off"></textarea></td>
+		<td colspan="2"><input type="text" id="countInTo" size="10" value="1" readonly /><textarea id="inTo" wrap="off"></textarea></td>
+	</tr>
+	<tr><td nowrap>
+		row = rows.<label><input type="radio" name="from" id="splitFrom" checked="checked" />split(</label><label><input type="radio" name="from" id="matchFrom" />match</label>(/<input type="text" id="rowRegexFrom" value="\n" />/<input type="text" id="rowModiFrom" size="4" value="ig" />)<br />
+		if (<label><input type="checkbox" id="doFnFrom" />.checked</label>) {
+		<pre>	row = f(row, i) { <select id="selFnFrom">
+			<option value="0">Built-in:</option>
+			<option value="1">toCamelCase</option>
+			<option value="2">ToPascalCase</option>
+			<option value="3">to_underscores</option>
+			<option value="4">getFirstWord</option>
+			<option value="5">UPPER-2-lower</option>
+			<option value="6">v as k -> "k" = v</option>
+			<option value="7">Excel@colToPascal</option>
+			<option value="8">ASCII-art text</option>
+			<option value="9">Code-align</option>
+			<option value="10">Pivot</option>
+		</select></pre>
+	</td><td width="30%">
+		<label><input type="checkbox" id="delEmptyFrom" />delEmpty();</label><br />
+		<label><input type="checkbox" id="delDoubleFrom" />delDouble();</label><br />
+		<label><input type="checkbox" id="numDoubleFrom" />numDouble();</label>
+	</td><td nowrap>
+		row = rows.<label><input type="radio" name="to" id="splitTo" checked="checked" />split(</label><label><input type="radio" name="to" id="matchTo" />match</label>(/<input type="text" id="rowRegexTo" value="\n" />/<input type="text" id="rowModiTo" size="4" value="ig" />)<br />
+		if (<label><input type="checkbox" id="doFnTo" />.checked</label>) {
+		<pre>	row = f(row, i) { <select id="selFnTo">
+			<option value="0">Built-in:</option>
+			<option value="1">toCamelCase</option>
+			<option value="2">ToPascalCase</option>
+			<option value="3">to_underscores</option>
+			<option value="4">getFirstWord</option>
+			<option value="5">UPPER-2-lower</option>
+			<option value="6">v as k -> "k" = v</option>
+			<option value="7">Excel@colToPascal</option>
+			<option value="8">ASCII-art text</option>
+			<option value="9">Code-align</option>
+			<option value="10">Pivot</option>
+		</select></pre>
+	</td><td width="30%">
+		<label><input type="checkbox" id="delEmptyTo" />delEmpty();</label><br />
+		<label><input type="checkbox" id="delDoubleTo" />delDouble();</label><br />
+		<label><input type="checkbox" id="numDoubleTo" />numDouble();</label>
+	</td></tr>
+	
+	<tr><td colspan="2" height="25%"><div class="cont"><div id="viewFrom">&nbsp;</div><textarea id="fnFrom" rows="10" wrap="off"></textarea></div>
+	</td><td colspan="2"><div class="cont"><div id="viewTo">&nbsp;</div><textarea id="fnTo" rows="10" wrap="off"></textarea></div>
+	</td></tr>
+	
+	<tr><td><pre>	}</pre>
+		}
+	</td><td>
+		<label><input type="checkbox" id="delWhiteFrom" />delWhiteSpace();</label><br />
+		<label><input type="checkbox" id="sortFrom" />sort(</label><label><input type="checkbox" id="customSortFrom" />function(a, b){}</label>)<label><input type="checkbox" id="reverseFrom" />reverse();</label>
+	</td><td><pre>	}</pre>
+		}
+	</td><td>
+		<label><input type="checkbox" id="delWhiteTo" />delWhiteSpace();</label><br />
+		<label><input type="checkbox" id="sortTo" />sort(</label><label><input type="checkbox" id="customSortTo" />function(a, b){}</label>)</label><label><input type="checkbox" id="reverseTo" />reverse();</label>
+	</td></tr>
+	
+	<tr><td>
+		out = <select id="tabFrom">
+			<option value="0">0 tabs</option>
+			<option value="1">1 tab</option>
+			<option value="2">2 tabs</option>
+			<option value="3">3 tabs</option>
+			<option value="4">4 tabs</option>
+			<option value="5">5 tabs</option>
+		</select><input type="text" id="rowFrom" value="~" size="40" />
+	</td><td style="position:relative">
+		<input type="text" id="sepFrom" size="10" /><label><input type="checkbox" checked="checked" id="lnFrom" />\n</label>
+		<button type="button" id="goFrom">\/ Go</button>
+		<a href="macro-tool.html" target="_blank" style="position:absolute;right:1em">Open another ^</a>
+	</td><td>
+		out = <select id="tabTo">
+			<option value="0">0 tabs</option>
+			<option value="1">1 tab</option>
+			<option value="2">2 tabs</option>
+			<option value="3">3 tabs</option>
+			<option value="4">4 tabs</option>
+			<option value="5">5 tabs</option>
+		</select><input type="text" id="rowTo" value="~" size="40" />
+	</td><td>
+		<input type="text" id="sepTo" size="10" /><label><input type="checkbox" checked="checked" id="lnTo" />\n</label>
+		<button type="button" id="goTo">\/ Go</button>
+	</td></tr>
+	<tr height="33%">
+		<td colspan="2"><input type="text" id="countOutFrom" size="10" value="1" readonly /><textarea id="outFrom" wrap="off"></textarea></td>
+		<td colspan="2"><input type="text" id="countOutTo" size="10" value="1" readonly /><textarea id="outTo" wrap="off"></textarea></td>
+	</tr>
+</table>
+</body>
