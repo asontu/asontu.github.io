@@ -6,6 +6,8 @@ tags: c# back-end sitecore
 
 If you've ever exported form submissions as CSV file from Sitecore 9+ Forms, you might've noticed the order in which the columns are exported seems completely random. We can fix this by implementing our own `IExportDataProvider`.
 
+#### _It seems that as of Sitecore 10.2+ the export **does** properly sort the columns and the solution below is no longer needed_
+
 The way I've implemented this is by decompiling the Sitecore native `CsvExportProvider` and adding the sorting code to that, but I'm not gonna post the decompiled code here publicly. So instead I'll describe how to do that part of it.
 
 Firstly decompile `Sitecore.ExperienceForms.Client.Data.CsvExportProvider` and take all the code needed to replicate the existing CSV export. The Sitecore 9.3 version of that has a `GenerateFileContent(IEnumerable<FormEntry> formEntries)` method that needs the sorting code added. Add the `Guid formId` from the `IExportDataProvider`'s `Export()` method to the signature.
