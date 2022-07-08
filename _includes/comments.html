@@ -21,7 +21,8 @@
 %}{%		assign date        = comment.date
 %}{%		assign message     = comment.message
 %}{%		assign uid         = comment._id
-%}{%		include comment.html index=index replying_to=replying_to name=name url=url date=date message=message uid=uid
+%}{%		assign author      = comment.author
+%}{%		include comment.html index=index replying_to=replying_to name=name url=url date=date message=message uid=uid author=author
 %}{%	endfor
 %}	</div>
 {%	endif
