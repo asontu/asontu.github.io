@@ -4,7 +4,10 @@
 
 	<div class="comment__author">
 		{{ include.name }},
-		<span class="comment__date">
+{%		if include.author
+%}			<em>(author)</em>
+{%		endif
+%}		<span class="comment__date">
 {%			if include.date
 %}{%			if include.index
 %}					<a href="#comment{{ include.index | prepend: '-' }}" title="Permalink to this comment">
@@ -39,5 +42,6 @@
 %}{%	assign url         = reply.url
 %}{%	assign date        = reply.date
 %}{%	assign message     = reply.message
-%}{%	include comment.html index=index replying_to=replying_to name=name url=url date=date message=message
+%}{%	assign author      = reply.author
+%}{%	include comment.html index=index replying_to=replying_to name=name url=url date=date message=message author=author
 %}{% endfor %}
