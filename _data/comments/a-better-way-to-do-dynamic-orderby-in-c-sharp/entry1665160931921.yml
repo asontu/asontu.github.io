@@ -1,0 +1,9 @@
+_id: fd64df70-465e-11ed-b81e-efe2eb3f7f7e
+_parent: >-
+  https://asontu.github.io/2020/04/02/a-better-way-to-do-dynamic-orderby-in-c-sharp.html
+replying_to: ''
+replying_to_uid: ''
+message: "Hi Graham,\r\nHow I define the 'queryable' variable to begin with.\r\nIn my case I have to sort a list of objects not by one field , by several fields. the sorting definition is a list by itself.\r\n\r\nThanks"
+name: Itzhak
+hp: ''
+date: 1665160931
