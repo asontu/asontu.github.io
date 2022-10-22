@@ -1,0 +1,10 @@
+_id: 96f78aa0-5250-11ed-8cfc-35bd9eafacad
+_parent: >-
+  https://asontu.github.io/2020/04/02/a-better-way-to-do-dynamic-orderby-in-c-sharp.html
+replying_to: '5'
+replying_to_uid: fd64df70-465e-11ed-b81e-efe2eb3f7f7e
+message: "Hi Itzhak,\r\n\r\nYou could do something like this:\r\n\r\n```c#\r\nstring[] sortingDefinitions = new string[3] { \"age\", \"hired\", \"name\" };\r\n\r\nIOrderedQueryable<SearchResultItem>? queryable = null;\r\n\r\nforeach (var sortingDefinition in sortingDefinitions)\r\n{\r\n    queryable = queryable?.ThenBy(OrderFunctions[sortingDefinition])\r\n        ?? yourListOfObjects.AsQueryable().OrderBy(OrderFunctions[sortingDefinition]);\r\n}\r\n```\r\n\r\nThe line in the `foreach` is a shorthand to say _\"if queryable isn't defined yet, define it from `yourListOfObjects` with the first `sortingDefinition` as `OrderBy()`, else expand it with `ThenBy()`\"_."
+name: Herman
+hp: ''
+date: 1666474160
+author: true
