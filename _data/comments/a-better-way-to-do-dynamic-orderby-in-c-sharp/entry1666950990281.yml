@@ -1,0 +1,9 @@
+_id: cba56f10-56a6-11ed-bbbf-5151e1bbcb68
+_parent: >-
+  https://asontu.github.io/2020/04/02/a-better-way-to-do-dynamic-orderby-in-c-sharp.html
+replying_to: '6'
+replying_to_uid: 17e38e60-55a4-11ed-8327-c192c15cdb90
+message: "Hi Lars,\r\n\r\nSince I focus on Sitecore on this blog, I can see why it might look like that. In reality I use this for Entity Framework as well with a generics-version of the code that looks like:\r\n\r\n```c#\r\npublic class OrderBy<TToOrder, TBy> : IOrderBy\r\n{\r\n\tprivate readonly Expression<Func<TToOrder, TBy>> expression;\r\n\t\r\n\tpublic OrderBy(Expression<Func<TToOrder, TBy>> expression)\r\n\t{\r\n\t\tthis.expression = expression;\r\n\t}\r\n\r\n\tpublic dynamic Expression => this.expression;\r\n}\r\n```\r\n\r\nThen you can instantiate with something like `new OrderBy<YourEFDbSetType, DateTime>(x => x.LastModified)` and the rest of the code is the same."
+name: Herman
+hp: ''
+date: 1666950990
