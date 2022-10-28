@@ -1,0 +1,9 @@
+_id: 3e06a8c0-56d5-11ed-9388-1be18c024995
+_parent: >-
+  https://asontu.github.io/2020/04/02/a-better-way-to-do-dynamic-orderby-in-c-sharp.html
+replying_to: ''
+replying_to_uid: ''
+message: "This is very cool! I'm a little upset that I couldn't come up with this myself, but I learned something.\r\nAlso, one non-expert suggestion is to use nameof with the EF class and property as the Dictionary key, and on the call, avoiding \"magic strings\"."
+name: Roger
+hp: ''
+date: 1666970939
