@@ -26,7 +26,8 @@ $transition: .2s ease-in-out;
 		box-sizing: border-box;
 		height: 40px;
 		width: 60px;
-		border: 1px solid rgba(255, 255, 255, .15);
+		border: 1px solid rgba(255, 255, 255, .5);
+		background: rgba(255, 255, 255, .15);
 		border-radius: 20px;
 		position: absolute;
 		right: 0;
@@ -618,7 +619,8 @@ textarea:focus, input[type=text]:focus, button:focus {
 
 	#page-title {
 		label::before {
-			border-color: rgba(0, 0, 0, .15);
+			border-color: rgba(0, 0, 0, .5);
+			background: rgba(0, 0, 0, .15);
 		}
 		label::after {
 			right: 3px;
