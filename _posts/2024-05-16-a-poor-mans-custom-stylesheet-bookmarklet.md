@@ -23,11 +23,14 @@ javascript:(function(){
         styleTag.style.position = 'fixed';
         styleTag.style.top = '0';
         styleTag.style.minHeight = '1em';
-        styleTag.style.minWidth= '4em';
+        styleTag.style.maxHeight = '100vh';
+        styleTag.style.minWidth = '4em';
+        styleTag.style.maxWidth = '50vw';
+        styleTag.style.overflow = 'auto';
         styleTag.style.zIndex = '99999';
         styleTag.style.padding = '3px';
         styleTag.style.whiteSpace = 'pre';
-        styleTag.style.background = '#000';
+        styleTag.style.background = 'rgba(0, 0, 0, .85)';
         styleTag.style.color = '#fff';
         styleTag.style.fontFamily = 'consolas, monospace';
         document.body.appendChild(styleTag);
@@ -35,7 +38,7 @@ javascript:(function(){
     if (!styleTag.innerText.trim()) {
         var sheet = localStorage.getItem('niftyStyle');
         if (!sheet) {
-            sheet = 'html {\n    filter: invert(1) hue-rotate(180deg);\n}';
+            sheet = 'html {\n    filter: invert(95%) hue-rotate(180deg);\n}';
             styleTag.style.display = 'block';
         }
         styleTag.appendChild(document.createTextNode(sheet));
@@ -53,7 +56,7 @@ javascript:(function(){
 
 You can simply copy this script and paste it in the field for the bookmark URL and it should work.
 
-The first time you click the bookmark it finds that there is no saved stylesheet for the domain you're on and it adds a visible `<style>` tag to the page, absolutely positioned at the top-left of the page. By default it adds a small snippet that acts like a poor man's dark mode also discussed [earlier on this blog](/2020/04/21/styling-external-iframe-content.html). You can write the CSS you want and when you're done, click the bookmark a second time and it will save the CSS in the `localStorage` associated with that domain and hide the style tag. Now any time you visit the website and click the bookmark, it will see that you have CSS saved and apply it silently. Clicking the bookmark toggles the visibility of the `<style>` tag so you can continue editing and save etc.
+The first time you click the bookmark it finds that there is no saved stylesheet for the domain you're on and it adds a visible `<style>` tag to the page, absolutely positioned at the top-left of the page. By default it adds a small snippet that acts like a poor man's dark mode also discussed [earlier on this blog](/2020/04/21/styling-external-iframe-content.html). You can write the CSS you want and when you're done, click the bookmark a second time and it will save the CSS in the `localStorage` associated with that domain and hide the style tag. Now any time you visit the website and click the bookmark, it will see that you have CSS saved and apply it silently. Clicking the bookmark toggles the visibility of the `<style>` tag so you can continue editing and saving etc.
 
 Q&A - Why it's a "poor man's" solution
 --------------------------------------
@@ -61,7 +64,7 @@ Q&A - Why it's a "poor man's" solution
 - **_Every time I click a link and the page refreshes, my style is gone and I have to click the bookmark again!_**  
   Such is the nature of websites, browser plug-ins can solve this for you, a bookmarklet cannot. You might get lucky and encounter a website that loads new content through ajax, but likely you won't.
 - **_This doesn't work in Firefox!_**  
-  That's because of the `contentEditable = 'plaintext-only'` which is a [WebKit](https://webkit.org/) and [Blink](https://www.chromium.org/blink/) exclusive feature. Luckily this means it works in Edge, Safari, Opera and a bunch more, but not Firefox. You could look into [alternatives](https://stackoverflow.com/a/61237402/2684660) to stop Firefox from adding html to the `<style>` tag if you need it to work there.
+  That's because of the `contentEditable = 'plaintext-only'` which is a [WebKit](https://webkit.org/) and [Blink](https://www.chromium.org/blink/) exclusive feature. Luckily this means it works in Chrome, Edge, Safari, Brave, Opera and a bunch more, but not Firefox. You could look into [alternatives](https://stackoverflow.com/a/61237402/2684660) to stop Firefox from adding html to the `<style>` tag if you need it to work there.
 - **_This doesn't work for website_ X _!_**  
   This is possibly because that website uses strict CSP headers preventing `<style>` tags directly on the page and only loads CSS that's in a separate resource on the server.
 - **_The style tag is in the way of the element I want to style!_**  
