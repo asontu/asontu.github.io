@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Roller Derby skater number flashcard</title>
+        <style type="text/css">
+            body {
+                font-family: sans-serif;
+                font-size: 70vh;
+                line-height: 100vh;
+                text-align: center;
+                padding:0;
+                margin:0;
+            }
+        </style>
+        <script type="text/javascript">
+            var colors = [
+                ['white', 'black'],
+                ['black', 'white'],
+                ['red', 'white'],
+                ['blue', 'white'],
+                ['yellow', 'black'],
+                ['green', 'white'],
+                ['purple', 'white'],
+                ['hotpink', 'black'],
+                ['orange', 'black']
+            ];
+            var wakeLock;
+            async function aquireWakeLock() {
+                try {
+                    wakeLock = await top.navigator.wakeLock.request('screen');
+                } catch (err) {
+                    console.error(err);
+                    return;
+                }
+                
+                if (top.document.title.charAt(0) !== '🟢') {
+                    top.document.title='🟢'+top.document.title;
+                }
+                wakeLock.onrelease = function(e) {
+                    top.document.title=top.document.title.replace(/^🟢+/,'');
+                }
+            };
+            document.addEventListener('DOMContentLoaded', () => {
+                var shirt = document.body;
+                setInterval(() => {
+                    let color = colors[Math.floor(Math.random() * colors.length)];
+                    let digits = Math.floor(Math.random() * 4) + 1;
+                    let number = '';
+                    while (digits--) {
+                        number += `${Math.floor(Math.random() * 10)}`;
+                    }
+                    shirt.style.background = color[0];
+                    shirt.style.color = color[1];
+                    shirt.innerText = number;
+                }, 10000);
+                aquireWakeLock();
+            });// */
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') {
+                    aquireWakeLock();
+                }
+            });
+        </script>
+    </head>
+    <body>
+        1337
+    </body>
+</html>
