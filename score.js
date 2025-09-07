@@ -35,9 +35,10 @@ var LINEUP = 2;
 var JAM_ON = 3;
 var TTO = 4;
 var OTO = 5;
-var HALFTIME = 6;
-var END_BOUT = 7;
-var SCORE_OK = 8;
+var OR = 6;
+var HALFTIME = 7;
+var END_BOUT = 8;
+var SCORE_OK = 9;
 
 var aNowTexts = [
 	'Line-up:',
@@ -46,6 +47,7 @@ var aNowTexts = [
 	'Jam is on:',
 	'Team time-out:',
 	'Official time-out:',
+	'Official review:',
 	'Halftime:',
 	'Unofficial score',
 	'Final score'
@@ -79,8 +81,8 @@ function jamSecondElapsed() {
 	}
 	// else get the current time
 	var iSec = getSec('jamclock');
-	// substract a second, unless we're in OTO which can last as long as needed
-	iSec += iState === OTO ? 1 : -1;
+	// substract a second, unless we're in OTO or OR which can last as long as needed
+	iSec += iState === OTO || iState === OR ? 1 : -1;
 	// if that results in 0 or more seconds, set to the jamclock
 	if (iSec >= 0)
 		setSec('jamclock', iSec);
@@ -125,6 +127,7 @@ function startStopJam() {
 		case HALFTIME:
 		case TTO:
 		case OTO:
+		case OR:
 			iState = LINEUP_1;
 			startTiming(30);
 		break;
@@ -162,6 +165,9 @@ function startTimeOut() {
 			clearInterval(tPeriodTimer);
 			startTiming(0);
 		break;
+		case OR:
+			iState = OTO;
+		break;
 		case OTO:
 			if (getSec('jamclock') <= 60) {
 				iState = TTO;
@@ -173,6 +179,16 @@ function startTimeOut() {
 			setSec('jamclock', 60 - getSec('jamclock'));
 		break;
 	}
+	$('now').innerText = aNowTexts[iState];
+}
+function startOfficialReview() {
+	if (iState !== OTO && iState !== TTO) {
+		return;
+	}
+	if (iState === TTO) {
+		setSec('jamclock', 60 - getSec('jamclock'));
+	}
+	iState = OR;
 	$('now').innerText = aNowTexts[iState];
 }
 function togglePeriod() {
@@ -198,6 +214,7 @@ window.onload=function() {
 			case 'c': $('score3').innerText--; break;
 			case ' ': startStopJam(); break;
 			case 'Escape': startTimeOut(); break;
+			case 'o': startOfficialReview(); break;
 			case 'p': togglePeriod(); break;
 			case '?': $('help').classList.toggle('hidden'); break;
 			default:
