@@ -150,6 +150,10 @@ function startStopJam() {
 }
 function startTimeOut() {
 	switch (iState) {
+		case HALFTIME:
+			iPeriod = 1;
+			$('period').innerText = aPeriodTexts[iPeriod];
+			setSec('periodclock', 0);
 		case LINEUP_1:
 		case LINEUP:
 		case END_BOUT:
