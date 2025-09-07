@@ -159,6 +159,7 @@ function startTimeOut() {
 			setSec('periodclock', 0);
 		case LINEUP_1:
 		case LINEUP:
+		case JAM_ON:
 		case END_BOUT:
 		case SCORE_OK:
 			iState = OTO;
