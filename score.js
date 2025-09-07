@@ -152,6 +152,8 @@ function startTimeOut() {
 	switch (iState) {
 		case LINEUP_1:
 		case LINEUP:
+		case END_BOUT:
+		case SCORE_OK:
 			iState = OTO;
 			clearInterval(tPeriodTimer);
 			startTiming(0);
