@@ -190,36 +190,16 @@ window.onload=function() {
 	window.onkeydown = function(e) {
 		if (e.target.matches('input[type="text"],textarea,[contenteditable="true"]')) return;
 		switch (e.key) {
-			case 'r':
-				$('score1').innerText++;
-			break;
-			case 'f':
-				$('score2').innerText++;
-			break;
-			case 'v':
-				$('score3').innerText++;
-			break;
-			case 'e':
-				$('score1').innerText--;
-			break;
-			case 'd':
-				$('score2').innerText--;
-			break;
-			case 'c':
-				$('score3').innerText--;
-			break;
-			case ' ':
-				startStopJam();
-			break;
-			case 'Escape':
-				startTimeOut();
-			break;
-			case 'p':
-				togglePeriod();
-			break;
-			case '?':
-				$('help').classList.toggle('hidden');
-			break;
+			case 'r': $('score1').innerText++; break;
+			case 'f': $('score2').innerText++; break;
+			case 'v': $('score3').innerText++; break;
+			case 'e': $('score1').innerText--; break;
+			case 'd': $('score2').innerText--; break;
+			case 'c': $('score3').innerText--; break;
+			case ' ': startStopJam(); break;
+			case 'Escape': startTimeOut(); break;
+			case 'p': togglePeriod(); break;
+			case '?': $('help').classList.toggle('hidden'); break;
 			default:
 				if (!isNaN(e.key)) {
 					let clock = iState === HALFTIME ? 'jamclock' : 'periodclock';
