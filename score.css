@@ -10,6 +10,10 @@ html, body {
 	font-weight:100;
 }
 
+.hidden {
+	display: none;
+}
+
 .teams, .scores {
 	float:left;
 	width:100%;

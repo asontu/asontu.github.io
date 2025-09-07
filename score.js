@@ -23,18 +23,10 @@ function setSec(id, to) {
 function score(e) {
 	// Add or substract a point to the score that was clicked on
 	e.currentTarget.innerText = (
-		parseInt(e.currentTarget.innerText) + ((e.altKey)?-1:1)
+		parseInt(e.currentTarget.innerText) + ((e.altKey) ? -1 : 1)
 	);
 	e.preventDefault();
 	e.stopPropagation();
-}
-
-var bNoKeys = false;
-function f() {
-	bNoKeys = true;
-}
-function b() {
-	bNoKeys = false;
 }
 
 var PRE_BOUT = 0;
@@ -64,7 +56,7 @@ var aPeriodTexts = ['',
 	'2nd'
 ];
 
-var iPeriodSecs = 20 * 60;
+var iPeriodSecs = 30 * 60;
 var iBreakSecs = 15 * 60;
 
 var iState = PRE_BOUT;
@@ -72,23 +64,23 @@ var iPeriod = 1;
 
 var tJamTimer, tPeriodTimer;
 
-function nextJam(iSec) {
+function startTiming(iSec) {
 	// Sets the jamclock to time the next thing (jam, line-up, T/O or halftime)
 	clearInterval(tJamTimer);
 	setSec('jamclock', iSec);
-	tJamTimer = setInterval(jamSecond, 1000);
+	tJamTimer = setInterval(jamSecondElapsed, 1000);
 }
 
-function jamSecond() {
+function jamSecondElapsed() {
 	// if we're in lineup and the periodclock just expired, the period ends
-	if (iState == LINEUP && getSec('periodclock')==0) {
+	if (iState === LINEUP && getSec('periodclock') === 0) {
 		periodEnd();
 		return;
 	}
 	// else get the current time
 	var iSec = getSec('jamclock');
 	// substract a second, unless we're in OTO which can last as long as needed
-	iSec += ((iState==OTO)?1:-1);
+	iSec += iState === OTO ? 1 : -1;
 	// if that results in 0 or more seconds, set to the jamclock
 	if (iSec >= 0)
 		setSec('jamclock', iSec);
@@ -103,14 +95,14 @@ function jamSecond() {
 }
 
 function periodEnd() {
-	if (iPeriod == 1) {
+	if (iPeriod === 1) {
 		iPeriod = 2;
 		$('period').innerText = aPeriodTexts[iPeriod];
 		iState = HALFTIME;
 		clearInterval(tPeriodTimer);
 		setSec('periodclock', iPeriodSecs);
-		nextJam(iBreakSecs);
-	} else if (iState != HALFTIME) {
+		startTiming(iBreakSecs);
+	} else if (iState !== HALFTIME) {
 		clearInterval(tPeriodTimer);
 		clearInterval(tJamTimer);
 		iState = END_BOUT;
@@ -118,13 +110,13 @@ function periodEnd() {
 	$('now').innerText = aNowTexts[iState];
 }
 
-function periodSecond() {
+function periodSecondElapsed() {
 	var iSec = getSec('periodclock');
 	if (iSec > 0)
 		setSec('periodclock', --iSec);
 }
 
-function jamClick() {
+function startStopJam() {
 	switch (iState) {
 		case PRE_BOUT:
 			iPeriodSecs = getSec('periodclock');
@@ -134,18 +126,18 @@ function jamClick() {
 		case TTO:
 		case OTO:
 			iState = LINEUP_1;
-			nextJam(30);
+			startTiming(30);
 		break;
 		case LINEUP_1:
-			tPeriodTimer = setInterval(periodSecond, 1000);
+			tPeriodTimer = setInterval(periodSecondElapsed, 1000);
 		case LINEUP:
 			iState = JAM_ON;
-			nextJam(120);
+			startTiming(120);
 		break;
 		case JAM_ON:
 			if (getSec('periodclock') > 0) {
 				iState = LINEUP;
-				nextJam(30);
+				startTiming(30);
 			} else {
 				periodEnd();
 			}
@@ -156,29 +148,29 @@ function jamClick() {
 	}
 	$('now').innerText = aNowTexts[iState];
 }
-function clockClick() {
+function startTimeOut() {
 	switch (iState) {
 		case LINEUP_1:
 		case LINEUP:
 			iState = OTO;
 			clearInterval(tPeriodTimer);
-			nextJam(0);
+			startTiming(0);
 		break;
 		case OTO:
 			if (getSec('jamclock') <= 60) {
 				iState = TTO;
-				setSec('jamclock', 60-getSec('jamclock'));
+				setSec('jamclock', 60 - getSec('jamclock'));
 			}
 		break;
 		case TTO:
 			iState = OTO;
-			setSec('jamclock', 60-getSec('jamclock'));
+			setSec('jamclock', 60 - getSec('jamclock'));
 		break;
 	}
 	$('now').innerText = aNowTexts[iState];
 }
-function periodClick() {
-	iPeriod = (iPeriod == 1)?2:1
+function togglePeriod() {
+	iPeriod = (iPeriod === 1) ? 2 : 1
 	$('period').innerText = aPeriodTexts[iPeriod];
 }
 
@@ -186,65 +178,55 @@ window.onload=function() {
 	$('score1').addEventListener('click', score, false);
 	$('score2').addEventListener('click', score, false);
 	$('score3').addEventListener('click', score, false);
-	$('now').addEventListener('click', jamClick, false);
-	$('jamclock').addEventListener('click', clockClick, false);
-	$('period').addEventListener('click', periodClick, false);
-	$('team1').addEventListener('focus', f);
-	$('team1').addEventListener('blur', b);
-	$('team2').addEventListener('focus', f);
-	$('team2').addEventListener('blur', b);
-	$('team3').addEventListener('focus', f);
-	$('team3').addEventListener('blur', b);
-	$('jamclock').addEventListener('focus', f);
-	$('jamclock').addEventListener('blur', b);
-	$('periodclock').addEventListener('focus', f);
-	$('periodclock').addEventListener('blur', b);
-	window.onkeydown=function(e) {
-		if (bNoKeys) return;
-		switch (e.keyCode) {
-			case 82: // R
+	$('now').addEventListener('click', startStopJam, false);
+	$('jamclock').addEventListener('click', startTimeOut, false);
+	$('period').addEventListener('click', togglePeriod, false);
+	window.onkeydown = function(e) {
+		if (e.target.matches('input[type="text"],textarea,[contenteditable="true"]')) return;
+		switch (e.key) {
+			case 'r':
 				$('score1').innerText++;
 			break;
-			case 70: // F
+			case 'f':
 				$('score2').innerText++;
 			break;
-			case 86: // V
+			case 'v':
 				$('score3').innerText++;
 			break;
-			case 69: // E
+			case 'e':
 				$('score1').innerText--;
 			break;
-			case 68: // D
+			case 'd':
 				$('score2').innerText--;
 			break;
-			case 67: // C
+			case 'c':
 				$('score3').innerText--;
 			break;
-			case 32: // [ ]
-				jamClick();
+			case ' ':
+				startStopJam();
 			break;
-			case 27: // [Esc]
-				clockClick();
+			case 'Escape':
+				startTimeOut();
 			break;
-			case 80: // P
-				periodClick();
+			case 'p':
+				togglePeriod();
 			break;
-			case 191: // ?
-				if (!e.shiftKey)
-					break;
-				$('help').style.display=($('help').style.display=='none')?'block':'none';
+			case '?':
+				$('help').classList.toggle('hidden');
 			break;
 			default:
-				if (e.keyCode >= 48 && e.keyCode <= 57) {
-					var nwSec = getSec('periodclock') +
-							((e.shiftKey?-1:1) *
-							((e.keyCode==48)?10:e.keyCode-48));
-					if (nwSec >= 0)
-						setSec('periodclock', nwSec);
+				if (!isNaN(e.key)) {
+					var newSec = e.ctrlKey ? -1 : 1;
+					newSec *= (parseInt(e.key) + 9) % 10 + 1;
+					newSec += getSec('periodclock');
+					if (newSec >= 0)
+						setSec('periodclock', newSec);
 				} else {
 //					$('team1').innerText = e.keyCode;
 				}
 			break;
 		}
+		e.preventDefault();
+		return false;
 	}
 }
