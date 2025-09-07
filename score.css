@@ -1,0 +1,65 @@
+html, body {
+	width:100%;
+	height:100%;
+	padding:0;
+	margin:0;
+	border:0;
+	background:#000;
+	color:#fff;
+	font-family:Helvetica, sans-serif;
+	font-weight:100;
+}
+
+.teams, .scores {
+	float:left;
+	width:100%;
+}
+
+.teams div, .scores div, .time {
+	float:left;
+	width:33.3%;
+	text-align:center;
+}
+
+.info {
+	float:left;
+	width:66.6%;
+	text-align:right;
+}
+
+.scores {
+	margin-bottom:.1em;
+	font-size:20vw;
+	letter-spacing:-20pt;
+}
+
+.teams {
+	font-size:9vw;
+}
+.info, .time {
+	font-size:7vw;
+}
+
+.scores div, #now, #jamclock[contenteditable=false], #period {
+	cursor:pointer;
+}
+
+#help {
+	position:absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+	padding:1em;
+	background:#000;
+}
+#help table {
+	border-collapse:collapse;
+}
+#help td, #help th {
+	border:1px solid #999;
+	padding:3px;
+}
+th {
+	vertical-align:top;
+}

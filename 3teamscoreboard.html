@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+	<head>
+		<title>The Hoarse Scoreboard</title>
+		<link rel="stylesheet" type="text/css" href="score.css">
+		<script type="text/javascript" src="score.js"></script>
+	</head>
+
+	<body>
+		<div class="teams">
+			<div id="team1" contenteditable="true">Red</div>
+			<div id="team2" contenteditable="true">White</div>
+			<div id="team3" contenteditable="true">Black</div>
+		</div>
+		<div class="scores">
+			<div id="score1">0</div>
+			<div id="score2">0</div>
+			<div id="score3">0</div>
+		</div>
+		<div class="info" id="now">Line-up:</div>
+		<div class="time" id="jamclock" contenteditable="true">15:00</div>
+		<div class="info"><span id="period">1st</span> period:</div>
+		<div class="time" id="periodclock" contenteditable="true">20:00</div>
+		<div id="help">
+			<h1>3-team Roller Derby Scoreboard</h1>
+			<h3>Set-up</h3>
+			<p>There is no "controls" screen, the operator views the scoreboard as-is, mirrored on a projector. Press <b>[F11]</b> or <b>[command]+[shift]+[F]</b> to set your browser to full screen. It is advised that the operator gets familiar with the keyboard way of using the scoreboard, though you could do it with the mouse. Most things are clickable.</p>
+			<p>Press <b>[shift]+[?]</b> to hide this help-screen. Set the desired period-time after "period:" and the desired half-time length after "Line-up:". Fill in the names for the teams. Press [space] or click on the "Line-up" to start the first Line-up time. The scoreboard never goes from "Line-up" to "Jam is on" or vice versa automatically, you have to press <b>[space]</b> or click the text.</p>
+			<h3>During game (keyboard style)</h3>
+			<table>
+				<tr><th>[space]</th><td>Cycles between <b>Line-up</b> and <b>Jam is on</b> until end of period is reached. After the first period half-time starts ticking and a <b>[space]</b> will start the 30 second line-up for the 2nd period. After the 2nd period, <b>[space]</b> will show <b>Final score</b>.</td></tr>
+				<tr><th>[Esc]</th><td>Only works during <b>Line-up</b>, cycles between <b>Official Time-out</b> and <b>Team time-out</b> unless an Official Time-out is longer than a minute. You could press <b>[space]</b> to start a <b>Line-up</b> and then press <b>[Esc]</b> twice to start a new Team time-out.</td></tr>
+				<tr><th>[1-0]</th><td>Adds 1 through 10 seconds to the period clock. Or when <b>[shift]</b> is helt down, subtracts 1 through 10 seconds from the period clock.</td></tr>
+				<tr><th>[E] [R]</th><td>Respectively substracts/adds a point for team 1.</td></tr>
+				<tr><th>[D] [F]</th><td>Respectively substracts/adds a point for team 2.</td></tr>
+				<tr><th>[C] [V]</th><td>Respectively substracts/adds a point for team 3.</td></tr>
+				<tr><th>[P]</th><td>Cycles between 1st period and 2nd period.</td></tr>
+				<tr><th>[?]</th><td>Hides/shows this screen</td></tr>
+			</table>
+			<h3>During game (mouse style)</h3>
+			<p>Click "Line-up:" to start the Jam, it'll change to "Jam is on:". Click "Jam is on:" to go to the next Line-up, etc.</p>
+			<p>During Line-up, you can click the jam-clock to go to an Official Time-out. Click again to switch to Team-timeout, and again to switch back, etc. You can't go from an Official time-out that has been lasting <b>longer</b> than a minute to a Team-timeout. You can, however, go to the next line-up by clicking the "Official time-out:" text and then clicking the jam-clock again.</p>
+			<p>Click a score to add a point. Hold down [Alt] and click to subtract a point.</p>
+			<p>Click the "1st" to switch to the 2nd period and back again, etc.</p>
+			<p align="right">made by the Hoarse Whistler</p>
+		</div>
+	</body>
+</html>
