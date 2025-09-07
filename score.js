@@ -222,11 +222,12 @@ window.onload=function() {
 			break;
 			default:
 				if (!isNaN(e.key)) {
+					let clock = iState === HALFTIME ? 'jamclock' : 'periodclock';
 					var newSec = e.ctrlKey ? -1 : 1;
 					newSec *= (parseInt(e.key) + 9) % 10 + 1;
-					newSec += getSec('periodclock');
+					newSec += getSec(clock);
 					if (newSec >= 0)
-						setSec('periodclock', newSec);
+						setSec(clock, newSec);
 				} else {
 //					$('team1').innerText = e.keyCode;
 				}
