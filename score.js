@@ -26,6 +26,26 @@ var aNowTexts = [
 	'Final score'
 ];
 
+var DomState = new (function() {
+	this.setScore = (team, score) => $(`score${team}`).innerText = score;
+	this.toggleHelp = () => $('help').classList.toggle('hidden');
+	this.setJamClock = (to) => setSeconds('jamclock', to);
+	this.setPeriodClock = (to) => setSeconds('periodclock', to);
+	this.setPeriodNumber = (to) => $('period').innerText = to;
+	
+	function setSeconds(id, to) {
+		// Set the display's time based on amount of seconds (with leading zeroes)
+		var r = [];
+		r[0] = Math.floor(to / 60);
+		r[1] = to % 60;
+		if (r[0] < 10)
+			r[0] = '0' + r[0];
+		if (r[1] < 10)
+			r[1] = '0' + r[1];
+		$(id).innerText = r.join(':');
+	}
+})();
+
 var GameState = new (function() {
 	var internalState = {
 		score: [0, 0, 0],
@@ -125,12 +145,21 @@ var GameState = new (function() {
 		internalState.period.number = (internalState.period.number === 1) ? 2 : 1
 		$('period').innerText = internalState.period.number;
 	}
-
 	this.addSeconds = (amount) => {
 		let clock = internalState.stage === HALFTIME ? 'jamclock' : 'periodclock';
 		amount += getSeconds(clock);
 		if (amount >= 0)
 			setSeconds(clock, amount);
+	}
+	this.increaseScore = (team, amount) => changeScore(team, (amount ?? 1));
+	this.decreaseScore = (team, amount) => changeScore(team, -(amount ?? 1));
+	function changeScore(team, amount) {
+		if (team < 1 || team > 3) return;
+		let teamIndex = team - 1;
+		internalState.score[teamIndex] += amount;
+		if (internalState.score[teamIndex] < 0)
+			internalState.score[teamIndex] = 0;
+		DomState.setScore(team, internalState.score[teamIndex]);
 	}
 
 	function startTiming(iSec) {
@@ -208,17 +237,23 @@ window.onload=function() {
 	window.onkeydown = function(e) {
 		if (e.target.matches('input[type="text"],textarea,[contenteditable="true"]')) return;
 		switch (e.key) {
-			case 'r': $('score1').innerText++; break;
-			case 'f': $('score2').innerText++; break;
-			case 'v': $('score3').innerText++; break;
-			case 'e': $('score1').innerText--; break;
-			case 'd': $('score2').innerText--; break;
-			case 'c': $('score3').innerText--; break;
+			case 'r': GameState.increaseScore(1); break;
+			case 'f': GameState.increaseScore(2); break;
+			case 'v': GameState.increaseScore(3); break;
+			case 't': GameState.increaseScore(1, 6); break;
+			case 'g': GameState.increaseScore(2, 6); break;
+			case 'b': GameState.increaseScore(3, 6); break;
+			case 'e': GameState.decreaseScore(1); break;
+			case 'd': GameState.decreaseScore(2); break;
+			case 'c': GameState.decreaseScore(3); break;
+			case 'w': GameState.decreaseScore(1, 6); break;
+			case 's': GameState.decreaseScore(2, 6); break;
+			case 'x': GameState.decreaseScore(3, 6); break;
 			case ' ': GameState.startStopJam(); break;
 			case 'Escape': GameState.startTimeOut(); break;
 			case 'o': GameState.startOfficialReview(); break;
 			case 'p': GameState.togglePeriod(); break;
-			case '?': $('help').classList.toggle('hidden'); break;
+			case '?': DomState.toggleHelp(); break;
 			default:
 				if (!isNaN(e.key)) {
 					let amount = e.ctrlKey ? -1 : 1;
