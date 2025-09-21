@@ -4,7 +4,7 @@ html, body {
 	padding:0;
 	margin:0;
 	border:0;
-	background:#000;
+	background:linear-gradient(#000 60%, #777);
 	color:#fff;
 	font-family:Helvetica, sans-serif;
 	font-weight:100;
@@ -15,26 +15,37 @@ html, body {
 }
 
 .teams, .scores {
-	float:left;
+	display:flex;
 	width:100%;
+	justify-content: space-around;
+}
+
+.teams div {
+	flex:1;
+}
+
+.scores div {
+	width: 31vw;
+	border-radius: 5vw;
+	background: #ddd;
+	color: black;
 }
 
 .teams div, .scores div, .time {
-	float:left;
-	width:33.3%;
 	text-align:center;
+}
+
+.scores {
+	margin-bottom:.1em;
+	font-size:20vw;
+	letter-spacing:-1.5vw;
+	text-indent:-1.5vw;
 }
 
 .info {
 	float:left;
 	width:66.6%;
 	text-align:right;
-}
-
-.scores {
-	margin-bottom:.1em;
-	font-size:20vw;
-	letter-spacing:-20pt;
 }
 
 .teams {

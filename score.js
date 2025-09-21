@@ -227,7 +227,9 @@ window.onload=function() {
 					if (newSec >= 0)
 						setSeconds(clock, newSec);
 				} else {
-//					$('team1').innerText = e.keyCode;
+/*					$('team1').innerText = e.key;
+					$('team2').innerText = e.code;
+					console.log(e); //*/
 				}
 			break;
 		}
