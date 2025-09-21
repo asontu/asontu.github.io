@@ -3,7 +3,7 @@ function $(id) {
 }
 
 var PRE_BOUT = 0;
-var LINEUP_1 = 1;
+var LINEUP_POST_TO = 1;
 var LINEUP = 2;
 var JAM_ON = 3;
 var TTO = 4;
@@ -27,98 +27,110 @@ var aNowTexts = [
 ];
 
 var GameState = new (function() {
-	var iPeriodSecs = 30 * 60;
-	var iBreakSecs = 15 * 60;
-	
-	var iState = PRE_BOUT;
-	var iPeriod = 1;
+	var internalState = {
+		score: [0, 0, 0],
+		stage: PRE_BOUT,
+		period: {
+			number: 1,
+			lastStarted: new Date(1970, 0),
+			secondsLeft: 30 * 60
+		},
+		jam: {
+			lastStarted: new Date(1970, 0),
+			secondsLeft: 30
+		},
+		halftime: {
+			lastStarted: new Date(1970, 0),
+			secondsLeft: 15 * 60
+		}
+	};
 	
 	var tJamTimer, tPeriodTimer;
 
 	this.startStopJam = () => {
-		switch (iState) {
+		switch (internalState.stage) {
 			case PRE_BOUT:
-				iPeriodSecs = getSeconds('periodclock');
-				iBreakSecs = getSeconds('jamclock');
+				internalState.period.secondsLeft = getSeconds('periodclock');
+				internalState.halftime.secondsLeft = getSeconds('jamclock');
 				$('jamclock').setAttribute('contenteditable', 'false');
 			case HALFTIME:
 			case TTO:
 			case OTO:
 			case OR:
-				iState = LINEUP_1;
+				internalState.stage = LINEUP_POST_TO;
 				startTiming(30);
 			break;
-			case LINEUP_1:
+			case LINEUP_POST_TO:
 				tPeriodTimer = setInterval(periodSecondElapsed, 1000);
 			case LINEUP:
-				iState = JAM_ON;
+				internalState.stage = JAM_ON;
 				startTiming(120);
 			break;
 			case JAM_ON:
 				if (getSeconds('periodclock') > 0) {
-					iState = LINEUP;
+					internalState.stage = LINEUP;
 					startTiming(30);
 				} else {
 					periodEnd();
 				}
 			break;
 			case END_BOUT:
-				iState = SCORE_OK;
+				internalState.stage = SCORE_OK;
 			break;
 		}
-		$('now').innerText = aNowTexts[iState];
+		$('now').innerText = aNowTexts[internalState.stage];
 	}
 	this.startTimeOut = () => {
-		switch (iState) {
+		switch (internalState.stage) {
 			case HALFTIME:
-				iPeriod = 1;
-				$('period').innerText = iPeriod;
+				internalState.period.number = 1;
+				$('period').innerText = internalState.period.number;
 				setSeconds('periodclock', 0);
-			case LINEUP_1:
+			case LINEUP_POST_TO:
 			case LINEUP:
 			case JAM_ON:
 			case END_BOUT:
 			case SCORE_OK:
-				iState = OTO;
+				internalState.stage = OTO;
 				clearInterval(tPeriodTimer);
 				startTiming(0);
 			break;
 			case OR:
-				iState = OTO;
+				internalState.stage = OTO;
 			break;
 			case OTO:
 				if (getSeconds('jamclock') <= 60) {
-					iState = TTO;
+					internalState.stage = TTO;
 					setSeconds('jamclock', 60 - getSeconds('jamclock'));
 				}
 			break;
 			case TTO:
-				iState = OTO;
+				internalState.stage = OTO;
 				setSeconds('jamclock', 60 - getSeconds('jamclock'));
 			break;
 		}
-		$('now').innerText = aNowTexts[iState];
+		$('now').innerText = aNowTexts[internalState.stage];
 	}
 	this.startOfficialReview = () => {
-		if (iState !== OTO && iState !== TTO) {
+		if (internalState.stage !== OTO && internalState.stage !== TTO) {
 			return;
 		}
-		if (iState === TTO) {
+		if (internalState.stage === TTO) {
 			setSeconds('jamclock', 60 - getSeconds('jamclock'));
 		}
-		iState = OR;
-		$('now').innerText = aNowTexts[iState];
+		internalState.stage = OR;
+		$('now').innerText = aNowTexts[internalState.stage];
 	}
 	this.togglePeriod = () => {
-		iPeriod = (iPeriod === 1) ? 2 : 1
-		$('period').innerText = iPeriod;
+		internalState.period.number = (internalState.period.number === 1) ? 2 : 1
+		$('period').innerText = internalState.period.number;
 	}
 
 	this.addSeconds = (amount) => {
-		let clock = iState === HALFTIME ? 'jamclock' : 'periodclock';
-		let newSec = amount + getSeconds(clock);
-		if (newSec >= 0)
-			setSeconds(clock, newSec);
+		let clock = internalState.stage === HALFTIME ? 'jamclock' : 'periodclock';
+		amount += getSeconds(clock);
+		if (amount >= 0)
+			setSeconds(clock, amount);
 	}
 
 	function startTiming(iSec) {
@@ -130,14 +142,14 @@ var GameState = new (function() {
 	
 	function jamSecondElapsed() {
 		// if we're in lineup and the periodclock just expired, the period ends
-		if (iState === LINEUP && getSeconds('periodclock') === 0) {
+		if (internalState.stage === LINEUP && getSeconds('periodclock') === 0) {
 			periodEnd();
 			return;
 		}
 		// else get the current time
 		var iSec = getSeconds('jamclock');
 		// substract a second, unless we're in OTO or OR which can last as long as needed
-		iSec += iState === OTO || iState === OR ? 1 : -1;
+		iSec += internalState.stage === OTO || internalState.stage === OR ? 1 : -1;
 		// if that results in 0 or more seconds, set to the jamclock
 		if (iSec >= 0)
 			setSeconds('jamclock', iSec);
@@ -152,19 +164,19 @@ var GameState = new (function() {
 	}
 	
 	function periodEnd() {
-		if (iPeriod === 1) {
-			iPeriod = 2;
-			$('period').innerText = iPeriod;
-			iState = HALFTIME;
+		if (internalState.period.number === 1) {
+			internalState.period.number = 2;
+			$('period').innerText = internalState.period.number;
+			internalState.stage = HALFTIME;
 			clearInterval(tPeriodTimer);
-			setSeconds('periodclock', iPeriodSecs);
-			startTiming(iBreakSecs);
-		} else if (iState !== HALFTIME) {
+			setSeconds('periodclock', internalState.period.secondsLeft);
+			startTiming(internalState.halftime.secondsLeft);
+		} else if (internalState.stage !== HALFTIME) {
 			clearInterval(tPeriodTimer);
 			clearInterval(tJamTimer);
-			iState = END_BOUT;
+			internalState.stage = END_BOUT;
 		}
-		$('now').innerText = aNowTexts[iState];
+		$('now').innerText = aNowTexts[internalState.stage];
 	}
 	
 	function periodSecondElapsed() {
@@ -209,9 +221,9 @@ window.onload=function() {
 			case '?': $('help').classList.toggle('hidden'); break;
 			default:
 				if (!isNaN(e.key)) {
-					var newSec = e.ctrlKey ? -1 : 1;
-					newSec *= (parseInt(e.key) + 9) % 10 + 1;
-					GameState.addSeconds(newSec);
+					let amount = e.ctrlKey ? -1 : 1;
+					amount *= (parseInt(e.key) + 9) % 10 + 1;
+					GameState.addSeconds(amount);
 				} else {
 /*					$('team1').innerText = e.key;
 					$('team2').innerText = e.code;
