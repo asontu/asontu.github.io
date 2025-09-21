@@ -20,39 +20,48 @@ html, body {
 	justify-content: space-around;
 }
 
-.teams div {
+.teams > div {
 	flex:1;
+	text-align:center;
+	font-size:9vw;
 }
 
-.scores div {
+.scores > div {
 	width: 31vw;
 	border-radius: 5vw;
 	background: #ddd;
 	color: black;
-}
-
-.teams div, .scores div, .time {
 	text-align:center;
-}
-
-.scores {
-	margin-bottom:.1em;
 	font-size:20vw;
 	letter-spacing:-1.5vw;
 	text-indent:-1.5vw;
 }
 
-.info {
-	float:left;
-	width:66.6%;
-	text-align:right;
+.game-state {
+	margin-top:5vw;
+	display:flex;
+	width: 100%;
+	justify-content: space-evenly;
 }
 
-.teams {
-	font-size:9vw;
+.game-state > div {
+	width: 40vw;
+	border-radius: 2vw;
+	overflow: hidden;
 }
-.info, .time {
-	font-size:7vw;
+
+.info {
+	padding: .2vw 0 .8vw;
+	font-size: 5vw;
+	text-align: center;
+	background: linear-gradient(#444, #222);
+}
+
+.time {
+	font-size:10vw;
+	text-align: center;
+	background: #ddd;
+	color: black;
 }
 
 .scores div, #now, #jamclock[contenteditable=false], #period {

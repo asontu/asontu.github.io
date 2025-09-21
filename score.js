@@ -41,14 +41,14 @@ var END_BOUT = 8;
 var SCORE_OK = 9;
 
 var aNowTexts = [
-	'Line-up:',
-	'Line-up:',
-	'Line-up:',
-	'Jam is on:',
-	'Team time-out:',
-	'Official time-out:',
-	'Official review:',
-	'Halftime:',
+	'Line-up',
+	'Line-up',
+	'Line-up',
+	'Jam is on',
+	'Team time-out',
+	'Official time-out',
+	'Official review',
+	'Halftime',
 	'Unofficial score',
 	'Final score'
 ];
