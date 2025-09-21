@@ -1,13 +1,13 @@
 html, body {
-	width:100%;
-	height:100%;
-	padding:0;
-	margin:0;
-	border:0;
-	background:linear-gradient(#000 60%, #777);
-	color:#fff;
-	font-family:Helvetica, sans-serif;
-	font-weight:100;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	background: linear-gradient(#000 60%, #777);
+	color: #fff;
+	font-family: Helvetica, sans-serif;
+	font-weight: 100;
 }
 
 .hidden {
@@ -15,15 +15,15 @@ html, body {
 }
 
 .teams, .scores {
-	display:flex;
-	width:100%;
+	display: flex;
+	width: 100%;
 	justify-content: space-around;
 }
 
 .teams > div {
-	flex:1;
-	text-align:center;
-	font-size:9vw;
+	flex: 1;
+	text-align: center;
+	font-size: 9vw;
 }
 
 .scores > div {
@@ -33,15 +33,15 @@ html, body {
 	border-radius: 3vw;
 	background: #ddd;
 	color: black;
-	text-align:center;
-	font-size:20vw;
-	letter-spacing:-1.5vw;
-	text-indent:-1.5vw;
+	text-align: center;
+	font-size: 20vw;
+	letter-spacing: -1.5vw;
+	text-indent: -1.5vw;
 }
 
 .game-state {
-	margin-top:5vw;
-	display:flex;
+	margin-top: 5vw;
+	display: flex;
 	width: 100%;
 	justify-content: space-evenly;
 }
@@ -69,25 +69,22 @@ html, body {
 }
 
 .scores div, #now, #jamclock[contenteditable=false], #period {
-	cursor:pointer;
+	cursor: pointer;
 }
 
 #help {
-	position:absolute;
-	top:0;
-	left:0;
-	right:0;
-	bottom:0;
-	padding:1em;
-	background:#000;
+	position: absolute;
+	inset: 0;
+	padding: 1em;
+	background: #000;
 }
 #help table {
-	border-collapse:collapse;
+	border-collapse: collapse;
 }
 #help td, #help th {
-	border:1px solid #999;
-	padding:3px;
+	border: 1px solid #999;
+	padding: 3px;
 }
 th {
-	vertical-align:top;
+	vertical-align: top;
 }
