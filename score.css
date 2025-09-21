@@ -28,7 +28,9 @@ html, body {
 
 .scores > div {
 	width: 31vw;
-	border-radius: 5vw;
+	height: 20vw;
+	line-height: 20vw;
+	border-radius: 3vw;
 	background: #ddd;
 	color: black;
 	text-align:center;
@@ -58,7 +60,9 @@ html, body {
 }
 
 .time {
-	font-size:10vw;
+	font-size: 10vw;
+	height: 10vw;
+	line-height: 10vw;
 	text-align: center;
 	background: #ddd;
 	color: black;
