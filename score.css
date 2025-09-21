@@ -68,10 +68,6 @@ html, body {
 	color: black;
 }
 
-.scores div, #now, #jamclock[contenteditable=false], #period {
-	cursor: pointer;
-}
-
 #help {
 	position: absolute;
 	inset: 0;
