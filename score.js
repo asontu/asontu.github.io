@@ -26,11 +26,6 @@ var aNowTexts = [
 	'Final score'
 ];
 
-var aPeriodTexts = ['',
-	'1st',
-	'2nd'
-];
-
 var GameState = new (function() {
 	var iPeriodSecs = 30 * 60;
 	var iBreakSecs = 15 * 60;
@@ -77,7 +72,7 @@ var GameState = new (function() {
 		switch (iState) {
 			case HALFTIME:
 				iPeriod = 1;
-				$('period').innerText = aPeriodTexts[iPeriod];
+				$('period').innerText = iPeriod;
 				setSeconds('periodclock', 0);
 			case LINEUP_1:
 			case LINEUP:
@@ -116,7 +111,7 @@ var GameState = new (function() {
 	}
 	this.togglePeriod = () => {
 		iPeriod = (iPeriod === 1) ? 2 : 1
-		$('period').innerText = aPeriodTexts[iPeriod];
+		$('period').innerText = iPeriod;
 	}
 
 	this.addSeconds = (amount) => {
@@ -159,7 +154,7 @@ var GameState = new (function() {
 	function periodEnd() {
 		if (iPeriod === 1) {
 			iPeriod = 2;
-			$('period').innerText = aPeriodTexts[iPeriod];
+			$('period').innerText = iPeriod;
 			iState = HALFTIME;
 			clearInterval(tPeriodTimer);
 			setSeconds('periodclock', iPeriodSecs);
