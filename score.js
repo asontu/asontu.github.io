@@ -14,7 +14,7 @@ var END_BOUT = 8;
 var SCORE_OK = 9;
 
 var aNowTexts = [
-	'Line-up',
+	'Halftime length',
 	'Line-up',
 	'Line-up',
 	'Jam is on',
@@ -25,14 +25,100 @@ var aNowTexts = [
 	'Unofficial score',
 	'Final score'
 ];
+var aStageClasses = [
+	'setup',
+	'lineup-countdown',
+	'lineup-countdown',
+	'jam-ongoing',
+	'team time-out',
+	'official time-out',
+	'review time-out',
+	'halftime',
+	'end score-check',
+	'end score-confirmed'
+];
+
+var initialState = {
+	teams: ['Red', 'White', 'Black'],
+	score: [0, 0, 0],
+	stage: PRE_BOUT,
+	period: {
+		number: 1,
+		lastStarted: new Date(1970, 0),
+		secondsLeft: 30 * 60
+	},
+	jam: {
+		lastStarted: new Date(1970, 0),
+		secondsLeft: 30
+	},
+	halftime: {
+		lastStarted: new Date(1970, 0),
+		secondsLeft: 15 * 60
+	}
+};
 
 var DomState = new (function() {
+	var self = this;
 	this.setScore = (team, score) => $(`score${team}`).innerText = score;
+	this.setTeam = (team, name) => $(`team${team}`).innerText = name;
 	this.toggleHelp = () => $('help').classList.toggle('hidden');
 	this.setJamClock = (to) => setSeconds('jamclock', to);
 	this.setPeriodClock = (to) => setSeconds('periodclock', to);
 	this.setPeriodNumber = (to) => $('period').innerText = to;
+	this.updateStage = (stage) => {
+		$('now').innerText = aNowTexts[stage];
+		document.body.className = aStageClasses[stage];
+		$('jamclock').contentEditable = stage === PRE_BOUT;
+	}
+	this.updateGameState = (state, reset) => {
+		reset ??= false;
+		for (let t = 0; t < 3; t++) {
+			if (reset || lastState.teams[t] !== state.teams[t]) self.setTeam(t + 1, state.teams[t]);
+			if (reset || lastState.score[t] !== state.score[t]) self.setScore(t + 1, state.score[t])
+		}
+		if (reset || lastState.period.number !== state.period.number) self.setPeriodNumber(state.period.number);
+		if (reset || lastState.period.secondsLeft !== state.period.secondsLeft) self.setPeriodClock(state.period.secondsLeft);
+		if (state.stage === PRE_BOUT) {
+			if (reset || lastState.halftime.secondsLeft !== state.halftime.secondsLeft) self.setJamClock(state.halftime.secondsLeft);
+		} else {
+			if (reset || lastState.jam.secondsLeft !== state.jam.secondsLeft) self.setJamClock(state.jam.secondsLeft);
+		}
+		if (reset || lastState.stage !== state.stage) self.updateStage(state.stage);
+		lastState = deepCopy(state);
+	}
+	this.setEventListeners = () => {
+		for (let t = 1; t <= 3; t++) {
+			$(`score${t}`).addEventListener('beforeinput', numbersOnly);
+			$(`score${t}`).addEventListener('blur', e => GameState.updateScore(t, parseInt(e.target.innerText)));
+			$(`team${t}`).addEventListener('blur', e => GameState.updateTeam(t, e.target.innerText));
+		}
+	}
+	async function numbersOnly(e) {
+		console.log(e);
+		console.log(window.getSelection());
+		if (e.data !== null) {
+			if (isNaN(e.data)) {
+				e.preventDefault();
+				return false;
+			}
+			return;
+		}
+		if (e.dataTransfer === null || e.dataTransfer.items.length === 0) return;
+		let addedText = await getTransferredText(e.dataTransfer.items[0]);
+		if (addedText.match(/\D/)) { // Non-digits found
+			e.preventDefault(); // Doesn't work because await gave thread back for event to execute default before preventing
+			return false;
+		}
+	}
+
+	function getTransferredText(dataTransferItem) {
+		return new Promise((resolve, reject) => dataTransferItem.getAsString(resolve));
+	}
 	
+	function deepCopy(obj) {
+		return JSON.parse(JSON.stringify(obj));
+	}
+
 	function setSeconds(id, to) {
 		// Set the display's time based on amount of seconds (with leading zeroes)
 		var r = [];
@@ -42,33 +128,17 @@ var DomState = new (function() {
 			r[0] = '0' + r[0];
 		if (r[1] < 10)
 			r[1] = '0' + r[1];
-		$(id).innerText = r.join(':');
+		$(id).innerHTML = r.join('<span>:</span>');
 	}
 })();
 
-var GameState = new (function() {
-	var internalState = {
-		score: [0, 0, 0],
-		stage: PRE_BOUT,
-		period: {
-			number: 1,
-			lastStarted: new Date(1970, 0),
-			secondsLeft: 30 * 60
-		},
-		jam: {
-			lastStarted: new Date(1970, 0),
-			secondsLeft: 30
-		},
-		halftime: {
-			lastStarted: new Date(1970, 0),
-			secondsLeft: 15 * 60
-		}
-	};
+var GameState = new (function(initialState) {
+	var internalState = initialState;
 	
 	var tJamTimer, tPeriodTimer;
 
 	this.startStopJam = () => {
-		switch (internalState.stage) {
+		switch (internalState.stage) { // the stage to _leave_
 			case PRE_BOUT:
 				internalState.period.secondsLeft = getSeconds('periodclock');
 				internalState.halftime.secondsLeft = getSeconds('jamclock');
@@ -101,7 +171,7 @@ var GameState = new (function() {
 		$('now').innerText = aNowTexts[internalState.stage];
 	}
 	this.startTimeOut = () => {
-		switch (internalState.stage) {
+		switch (internalState.stage) { // the stage to _leave_
 			case HALFTIME:
 				internalState.period.number = 1;
 				$('period').innerText = internalState.period.number;
@@ -151,12 +221,23 @@ var GameState = new (function() {
 		if (amount >= 0)
 			setSeconds(clock, amount);
 	}
-	this.increaseScore = (team, amount) => changeScore(team, (amount ?? 1));
-	this.decreaseScore = (team, amount) => changeScore(team, -(amount ?? 1));
-	function changeScore(team, amount) {
+	this.updateTeam = (team, name) => {
 		if (team < 1 || team > 3) return;
 		let teamIndex = team - 1;
-		internalState.score[teamIndex] += amount;
+		internalState.teams[teamIndex] = name;
+		DomState.updateGameState(internalState);
+	}
+	this.updateScore = (team, newScore) => changeScore(team, newScore, true);
+	this.increaseScore = (team, amount) => changeScore(team, (amount ?? 1));
+	this.decreaseScore = (team, amount) => changeScore(team, -(amount ?? 1));
+	function changeScore(team, amount, reset) {
+		reset ??= false;
+		if (team < 1 || team > 3) return;
+		let teamIndex = team - 1;
+		if (reset)
+			internalState.score[teamIndex] = amount;
+		else
+			internalState.score[teamIndex] += amount;
 		if (internalState.score[teamIndex] < 0)
 			internalState.score[teamIndex] = 0;
 		DomState.setScore(team, internalState.score[teamIndex]);
@@ -231,9 +312,11 @@ var GameState = new (function() {
 			r[1] = '0' + r[1];
 		$(id).innerText = r.join(':');
 	}
-})();
+})(initialState);
 
 window.onload=function() {
+	DomState.updateGameState(initialState, true);
+	DomState.setEventListeners();
 	window.onkeydown = function(e) {
 		if (e.target.matches('input[type="text"],textarea,[contenteditable="true"]')) return;
 		switch (e.key) {

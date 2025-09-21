@@ -67,6 +67,10 @@ html, body {
 	background: #ddd;
 	color: black;
 }
+.time span {
+	position: relative;
+	top: -.8vw;
+}
 
 #help {
 	position: absolute;
