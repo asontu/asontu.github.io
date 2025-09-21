@@ -2,13 +2,13 @@ function $(id) {
 	return document.getElementById(id);
 }
 
-function getSec(id) {
+function getSeconds(id) {
 	// Get the total amount of seconds from the time displayed
 	var r = $(id).innerText.split(':');
 	return parseInt(r[0]) * 60 + parseInt(r[1]);
 }
 
-function setSec(id, to) {
+function setSeconds(id, to) {
 	// Set the display's time based on amount of seconds (with leading zeroes)
 	var r = [];
 	r[0] = Math.floor(to / 60);
@@ -69,27 +69,27 @@ var tJamTimer, tPeriodTimer;
 function startTiming(iSec) {
 	// Sets the jamclock to time the next thing (jam, line-up, T/O or halftime)
 	clearInterval(tJamTimer);
-	setSec('jamclock', iSec);
+	setSeconds('jamclock', iSec);
 	tJamTimer = setInterval(jamSecondElapsed, 1000);
 }
 
 function jamSecondElapsed() {
 	// if we're in lineup and the periodclock just expired, the period ends
-	if (iState === LINEUP && getSec('periodclock') === 0) {
+	if (iState === LINEUP && getSeconds('periodclock') === 0) {
 		periodEnd();
 		return;
 	}
 	// else get the current time
-	var iSec = getSec('jamclock');
+	var iSec = getSeconds('jamclock');
 	// substract a second, unless we're in OTO or OR which can last as long as needed
 	iSec += iState === OTO || iState === OR ? 1 : -1;
 	// if that results in 0 or more seconds, set to the jamclock
 	if (iSec >= 0)
-		setSec('jamclock', iSec);
+		setSeconds('jamclock', iSec);
 	else {
 		// negative jamclock, don't set
 		// if the period is still running, just return.
-		if (getSec('periodclock') > 0)
+		if (getSeconds('periodclock') > 0)
 			return;
 		// is the period is also 0, period ends
 		periodEnd();
@@ -102,7 +102,7 @@ function periodEnd() {
 		$('period').innerText = aPeriodTexts[iPeriod];
 		iState = HALFTIME;
 		clearInterval(tPeriodTimer);
-		setSec('periodclock', iPeriodSecs);
+		setSeconds('periodclock', iPeriodSecs);
 		startTiming(iBreakSecs);
 	} else if (iState !== HALFTIME) {
 		clearInterval(tPeriodTimer);
@@ -113,16 +113,16 @@ function periodEnd() {
 }
 
 function periodSecondElapsed() {
-	var iSec = getSec('periodclock');
+	var iSec = getSeconds('periodclock');
 	if (iSec > 0)
-		setSec('periodclock', --iSec);
+		setSeconds('periodclock', --iSec);
 }
 
 function startStopJam() {
 	switch (iState) {
 		case PRE_BOUT:
-			iPeriodSecs = getSec('periodclock');
-			iBreakSecs = getSec('jamclock');
+			iPeriodSecs = getSeconds('periodclock');
+			iBreakSecs = getSeconds('jamclock');
 			$('jamclock').setAttribute('contenteditable', 'false');
 		case HALFTIME:
 		case TTO:
@@ -138,7 +138,7 @@ function startStopJam() {
 			startTiming(120);
 		break;
 		case JAM_ON:
-			if (getSec('periodclock') > 0) {
+			if (getSeconds('periodclock') > 0) {
 				iState = LINEUP;
 				startTiming(30);
 			} else {
@@ -156,7 +156,7 @@ function startTimeOut() {
 		case HALFTIME:
 			iPeriod = 1;
 			$('period').innerText = aPeriodTexts[iPeriod];
-			setSec('periodclock', 0);
+			setSeconds('periodclock', 0);
 		case LINEUP_1:
 		case LINEUP:
 		case JAM_ON:
@@ -170,14 +170,14 @@ function startTimeOut() {
 			iState = OTO;
 		break;
 		case OTO:
-			if (getSec('jamclock') <= 60) {
+			if (getSeconds('jamclock') <= 60) {
 				iState = TTO;
-				setSec('jamclock', 60 - getSec('jamclock'));
+				setSeconds('jamclock', 60 - getSeconds('jamclock'));
 			}
 		break;
 		case TTO:
 			iState = OTO;
-			setSec('jamclock', 60 - getSec('jamclock'));
+			setSeconds('jamclock', 60 - getSeconds('jamclock'));
 		break;
 	}
 	$('now').innerText = aNowTexts[iState];
@@ -187,7 +187,7 @@ function startOfficialReview() {
 		return;
 	}
 	if (iState === TTO) {
-		setSec('jamclock', 60 - getSec('jamclock'));
+		setSeconds('jamclock', 60 - getSeconds('jamclock'));
 	}
 	iState = OR;
 	$('now').innerText = aNowTexts[iState];
@@ -223,9 +223,9 @@ window.onload=function() {
 					let clock = iState === HALFTIME ? 'jamclock' : 'periodclock';
 					var newSec = e.ctrlKey ? -1 : 1;
 					newSec *= (parseInt(e.key) + 9) % 10 + 1;
-					newSec += getSec(clock);
+					newSec += getSeconds(clock);
 					if (newSec >= 0)
-						setSec(clock, newSec);
+						setSeconds(clock, newSec);
 				} else {
 //					$('team1').innerText = e.keyCode;
 				}
