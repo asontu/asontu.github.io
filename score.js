@@ -44,6 +44,7 @@ var initialState = {
 	stage: PRE_BOUT,
 	period: {
 		number: 1,
+		secondsTotal: 30 * 60,
 		lastStarted: new Date(1970, 0),
 		secondsLeft: 30 * 60
 	},
@@ -52,8 +53,7 @@ var initialState = {
 		secondsLeft: 30
 	},
 	halftime: {
-		lastStarted: new Date(1970, 0),
-		secondsLeft: 15 * 60
+		secondsTotal: 15 * 60
 	}
 };
 
@@ -79,12 +79,14 @@ var DomState = new (function() {
 		if (reset || lastState.period.number !== state.period.number) self.setPeriodNumber(state.period.number);
 		if (reset || lastState.period.secondsLeft !== state.period.secondsLeft) self.setPeriodClock(state.period.secondsLeft);
 		if (state.stage === PRE_BOUT) {
-			if (reset || lastState.halftime.secondsLeft !== state.halftime.secondsLeft) self.setJamClock(state.halftime.secondsLeft);
+			if (reset || lastState.halftime.secondsTotal !== state.halftime.secondsTotal) self.setJamClock(state.halftime.secondsTotal);
 		} else {
 			if (reset || lastState.jam.secondsLeft !== state.jam.secondsLeft) self.setJamClock(state.jam.secondsLeft);
 		}
 		if (reset || lastState.stage !== state.stage) self.updateStage(state.stage);
-		lastState = deepCopy(state);
+		lastState = deepCopy(state); // TODO: move deepCopy to GameState and set stuf in newState
+		if (state.stage === PRE_BOUT)
+			lastState.jam.secondsLeft = state.halftime.secondsTotal;
 	}
 	this.setEventListeners = () => {
 		for (let t = 1; t <= 3; t++) {
@@ -92,27 +94,29 @@ var DomState = new (function() {
 			$(`score${t}`).addEventListener('blur', e => GameState.updateScore(t, parseInt(e.target.innerText)));
 			$(`team${t}`).addEventListener('blur', e => GameState.updateTeam(t, e.target.innerText));
 		}
+		$('periodclock').addEventListener('beforeinput', timeOnly);
+		$('periodclock').addEventListener('blur', e => GameState.updatePeriodLength(getSeconds(e.target)));
+		$('jamclock').addEventListener('beforeinput', timeOnly);
+		$('jamclock').addEventListener('blur', e => GameState.updateHalftimeLength(getSeconds(e.target)));
 	}
-	async function numbersOnly(e) {
-		console.log(e);
-		console.log(window.getSelection());
-		if (e.data !== null) {
-			if (isNaN(e.data)) {
-				e.preventDefault();
-				return false;
-			}
-			return;
+	function numbersOnly(e) {
+		if (e.data !== null && isNaN(e.data)) {
+			e.preventDefault();
+			return false;
 		}
-		if (e.dataTransfer === null || e.dataTransfer.items.length === 0) return;
-		let addedText = await getTransferredText(e.dataTransfer.items[0]);
-		if (addedText.match(/\D/)) { // Non-digits found
-			e.preventDefault(); // Doesn't work because await gave thread back for event to execute default before preventing
+	}
+	function timeOnly(e) {
+		if (e.data !== null && isNaN(e.data) && e.data !== ':') {
+			e.preventDefault();
 			return false;
 		}
 	}
 
-	function getTransferredText(dataTransferItem) {
-		return new Promise((resolve, reject) => dataTransferItem.getAsString(resolve));
+	function getSeconds(element) {
+		var r = element.innerText.split(':');
+		return r.length < 2
+			? parseInt(r.join(''))
+			: parseInt(r[0]) * 60 + parseInt(r[1]);
 	}
 	
 	function deepCopy(obj) {
@@ -138,11 +142,9 @@ var GameState = new (function(initialState) {
 	var tJamTimer, tPeriodTimer;
 
 	this.startStopJam = () => {
-		switch (internalState.stage) { // the stage to _leave_
+		switch (internalState.stage) { // this _was_ the stage when starting/stopping a Jam
 			case PRE_BOUT:
-				internalState.period.secondsLeft = getSeconds('periodclock');
-				internalState.halftime.secondsLeft = getSeconds('jamclock');
-				$('jamclock').setAttribute('contenteditable', 'false');
+				internalState.period.secondsLeft = internalState.period.secondsTotal;
 			case HALFTIME:
 			case TTO:
 			case OTO:
@@ -151,13 +153,18 @@ var GameState = new (function(initialState) {
 				startTiming(30);
 			break;
 			case LINEUP_POST_TO:
+				internalState.period.lastStarted = new Date();
 				tPeriodTimer = setInterval(periodSecondElapsed, 1000);
 			case LINEUP:
-				internalState.stage = JAM_ON;
-				startTiming(120);
+				if (internalState.period.secondsLeft > 0) {
+					internalState.stage = JAM_ON;
+					startTiming(120);
+				} else {
+					periodEnd();
+				}
 			break;
 			case JAM_ON:
-				if (getSeconds('periodclock') > 0) {
+				if (internalState.period.secondsLeft > 0) {
 					internalState.stage = LINEUP;
 					startTiming(30);
 				} else {
@@ -168,14 +175,13 @@ var GameState = new (function(initialState) {
 				internalState.stage = SCORE_OK;
 			break;
 		}
-		$('now').innerText = aNowTexts[internalState.stage];
+		DomState.updateGameState(internalState);
 	}
 	this.startTimeOut = () => {
-		switch (internalState.stage) { // the stage to _leave_
+		switch (internalState.stage) { // this _was_ the stage when starting TimeOut
 			case HALFTIME:
 				internalState.period.number = 1;
-				$('period').innerText = internalState.period.number;
-				setSeconds('periodclock', 0);
+				internalState.period.secondsLeft = 0;
 			case LINEUP_POST_TO:
 			case LINEUP:
 			case JAM_ON:
@@ -189,37 +195,38 @@ var GameState = new (function(initialState) {
 				internalState.stage = OTO;
 			break;
 			case OTO:
-				if (getSeconds('jamclock') <= 60) {
+				if (internalState.jam.secondsLeft <= 60) {
 					internalState.stage = TTO;
-					setSeconds('jamclock', 60 - getSeconds('jamclock'));
+					internalState.jam.secondsLeft = 60 - internalState.jam.secondsLeft;
 				}
 			break;
 			case TTO:
 				internalState.stage = OTO;
-				setSeconds('jamclock', 60 - getSeconds('jamclock'));
+				internalState.jam.secondsLeft = 60 - internalState.jam.secondsLeft;
 			break;
 		}
-		$('now').innerText = aNowTexts[internalState.stage];
+		DomState.updateGameState(internalState);
 	}
 	this.startOfficialReview = () => {
 		if (internalState.stage !== OTO && internalState.stage !== TTO) {
 			return;
 		}
 		if (internalState.stage === TTO) {
-			setSeconds('jamclock', 60 - getSeconds('jamclock'));
+			internalState.jam.secondsLeft = 60 - internalState.jam.secondsLeft;
 		}
 		internalState.stage = OR;
-		$('now').innerText = aNowTexts[internalState.stage];
+		DomState.updateGameState(internalState);
 	}
 	this.togglePeriod = () => {
-		internalState.period.number = (internalState.period.number === 1) ? 2 : 1
-		$('period').innerText = internalState.period.number;
+		internalState.period.number = (internalState.period.number === 1) ? 2 : 1;
+		DomState.setPeriodNumber(internalState.period.number);
 	}
 	this.addSeconds = (amount) => {
-		let clock = internalState.stage === HALFTIME ? 'jamclock' : 'periodclock';
-		amount += getSeconds(clock);
+		let clock = internalState.stage === HALFTIME ? internalState.jam : internalState.period;
+		amount += clock.secondsLeft;
 		if (amount >= 0)
-			setSeconds(clock, amount);
+			clock.secondsLeft = amount;
+		DomState.updateGameState(internalState);
 	}
 	this.updateTeam = (team, name) => {
 		if (team < 1 || team > 3) return;
@@ -242,75 +249,56 @@ var GameState = new (function(initialState) {
 			internalState.score[teamIndex] = 0;
 		DomState.setScore(team, internalState.score[teamIndex]);
 	}
+	this.updatePeriodLength = (newLength) => {
+		if (internalState.stage !== PRE_BOUT) return;
+		internalState.period.secondsTotal = newLength;
+		internalState.period.secondsLeft = newLength;
+		DomState.updateGameState(internalState);
+	}
+	this.updateHalftimeLength = (newLength) => {
+		if (internalState.stage !== PRE_BOUT) return;
+		internalState.halftime.secondsTotal = newLength;
+		DomState.updateGameState(internalState);
+	}
 
 	function startTiming(iSec) {
 		// Sets the jamclock to time the next thing (jam, line-up, T/O or halftime)
 		clearInterval(tJamTimer);
-		setSeconds('jamclock', iSec);
+		internalState.jam.secondsLeft = iSec;
+		internalState.jam.lastStarted = new Date();
 		tJamTimer = setInterval(jamSecondElapsed, 1000);
+		DomState.updateGameState(internalState);
 	}
 	
 	function jamSecondElapsed() {
-		// if we're in lineup and the periodclock just expired, the period ends
-		if (internalState.stage === LINEUP && getSeconds('periodclock') === 0) {
-			periodEnd();
-			return;
-		}
-		// else get the current time
-		var iSec = getSeconds('jamclock');
+		var iSec = internalState.jam.secondsLeft;
 		// substract a second, unless we're in OTO or OR which can last as long as needed
-		iSec += internalState.stage === OTO || internalState.stage === OR ? 1 : -1;
-		// if that results in 0 or more seconds, set to the jamclock
-		if (iSec >= 0)
-			setSeconds('jamclock', iSec);
-		else {
-			// negative jamclock, don't set
-			// if the period is still running, just return.
-			if (getSeconds('periodclock') > 0)
-				return;
-			// is the period is also 0, period ends
-			periodEnd();
-		}
+		internalState.jam.secondsLeft += internalState.stage === OTO || internalState.stage === OR ? 1 : -1;
+		// if that results in less than 0 seconds, set to 0
+		if (internalState.jam.secondsLeft < 0)
+			internalState.jam.secondsLeft = 0;
+		DomState.updateGameState(internalState);
 	}
 	
 	function periodEnd() {
 		if (internalState.period.number === 1) {
 			internalState.period.number = 2;
-			$('period').innerText = internalState.period.number;
 			internalState.stage = HALFTIME;
 			clearInterval(tPeriodTimer);
-			setSeconds('periodclock', internalState.period.secondsLeft);
-			startTiming(internalState.halftime.secondsLeft);
+			internalState.period.secondsLeft = internalState.period.secondsTotal;
+			startTiming(internalState.halftime.secondsTotal);
 		} else if (internalState.stage !== HALFTIME) {
 			clearInterval(tPeriodTimer);
 			clearInterval(tJamTimer);
 			internalState.stage = END_BOUT;
 		}
-		$('now').innerText = aNowTexts[internalState.stage];
+		DomState.updateGameState(internalState);
 	}
 	
 	function periodSecondElapsed() {
-		var iSec = getSeconds('periodclock');
-		if (iSec > 0)
-			setSeconds('periodclock', --iSec);
-	}
-
-	function getSeconds(id) {
-		// Get the total amount of seconds from the time displayed
-		var r = $(id).innerText.split(':');
-		return parseInt(r[0]) * 60 + parseInt(r[1]);
-	}
-	
-	function setSeconds(id, to) {
-		// Set the display's time based on amount of seconds (with leading zeroes)
-		var r = [];
-		r[0] = Math.floor(to / 60);
-		r[1] = to % 60;
-		if (r[0] < 10)
-			r[0] = '0' + r[0];
-		if (r[1] < 10)
-			r[1] = '0' + r[1];
-		$(id).innerText = r.join(':');
+		if (internalState.period.secondsLeft > 0)
+			internalState.period.secondsLeft--;
+		DomState.updateGameState(internalState);
 	}
 })(initialState);
 
