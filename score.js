@@ -34,6 +34,7 @@ var initialState = {
 
 var DomState = new (function() {
 	var self = this;
+	var lastState = null;
 	this.setScore = (team, score) => $(`score${team}`).innerText = score;
 	this.setTeam = (team, name) => $(`team${team}`).innerText = name;
 	this.toggleHelp = () => $('help').classList.toggle('hidden');
@@ -47,7 +48,7 @@ var DomState = new (function() {
 		$('jamclock').contentEditable = stage === PRE_BOUT;
 	}
 	this.updateGameState = (state, reset) => {
-		reset ??= false;
+		reset ??= lastState === null;
 		for (let t = 0; t < 3; t++) {
 			if (reset || lastState.teams[t] !== state.teams[t]) self.setTeam(t + 1, state.teams[t]);
 			if (reset || lastState.score[t] !== state.score[t]) self.setScore(t + 1, state.score[t])
