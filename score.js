@@ -256,9 +256,10 @@ var GameState = new (function(initialState) {
 		DomState.setScore(team, internalState.score[teamIndex]);
 	}
 	this.updatePeriodLength = (newLength) => {
-		if (internalState.stage !== PRE_BOUT) return;
-		internalState.period.secondsTotal = newLength;
-		internalState.period.secondsLeft = newLength;
+		if (internalState.stage === PRE_BOUT)
+			internalState.period.secondsTotal = newLength;
+		if ([PRE_BOUT, LINEUP_POST_TO, OTO, TTO, OR, HALFTIME].includes(internalState.stage))
+			internalState.period.secondsLeft = newLength;
 		DomState.updateGameState(internalState);
 	}
 	this.updateHalftimeLength = (newLength) => {
