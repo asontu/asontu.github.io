@@ -60,14 +60,14 @@ html, body {
 }
 
 .time {
+	overflow: hidden;
 	font-size: 10vw;
-	height: 10vw;
 	line-height: 10vw;
 	text-align: center;
 	background: #ddd;
 	color: black;
 }
-.time span {
+.time:not(:focus-within) span {
 	position: relative;
 	top: -.8vw;
 }
