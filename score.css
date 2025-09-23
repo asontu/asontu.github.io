@@ -46,10 +46,57 @@ html, body {
 	justify-content: space-evenly;
 }
 
+#period-info,
+#jamclock {
+	max-height: 20vw;
+}
+
+:not(.setup) .game-state,
+:not(.setup) .game-state div {
+	transition: all .4s ease-in-out;
+}
+
 .game-state > div {
 	width: 40vw;
 	border-radius: 2vw;
 	overflow: hidden;
+}
+
+.game-state > #period-info > div {
+	width: 40vw;
+}
+
+.time-out #period-info,
+.time-out #period-info div {
+	width: 30vw;
+}
+.time-out #jam-info {
+	width: 50vw;
+}
+
+.end #period-info {
+	overflow: hidden;
+	width: 0;
+	opacity: 0;
+}
+.end #period-info div,
+.lineup #period-info div {
+	width: 40vw;
+}
+.end #jam-info {
+	width: 80vw;
+	margin-left: -10vw;
+}
+
+.score .game-state {
+	margin-top: 10vw;
+}
+.score #now {
+	font-size: 8vw;
+}
+.score #period-info,
+.score #jamclock {
+	max-height: 0;
 }
 
 .info {

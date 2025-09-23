@@ -27,15 +27,15 @@ var aNowTexts = [
 ];
 var aStageClasses = [
 	'setup',
-	'lineup-countdown',
-	'lineup-countdown',
+	'lineup',
+	'lineup',
 	'jam-ongoing',
 	'team time-out',
 	'official time-out',
 	'review time-out',
-	'halftime',
-	'end score-check',
-	'end score-confirmed'
+	'end period',
+	'end score check',
+	'end score confirmed'
 ];
 
 var initialState = {
@@ -67,7 +67,8 @@ var DomState = new (function() {
 	this.setPeriodNumber = (to) => $('period').innerText = to;
 	this.updateStage = (stage) => {
 		$('now').innerText = aNowTexts[stage];
-		document.body.className = aStageClasses[stage];
+		if (document.body.className.indexOf(aStageClasses[stage]) === -1)
+			document.body.className = aStageClasses[stage];
 		$('jamclock').contentEditable = stage === PRE_BOUT;
 	}
 	this.updateGameState = (state, reset) => {
