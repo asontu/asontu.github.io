@@ -150,8 +150,12 @@ var GameState = new (function(initialState) {
 			case TTO:
 			case OTO:
 			case OR:
-				internalState.stage = LINEUP_POST_TO;
-				startTiming(30);
+				if (internalState.period.secondsLeft > 0) {
+					internalState.stage = LINEUP_POST_TO;
+					startTiming(30);
+				} else {
+					periodEnd();
+				}
 			break;
 			case LINEUP_POST_TO:
 				internalState.period.lastStarted = new Date();
