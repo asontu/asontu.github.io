@@ -21,17 +21,23 @@ var initialState = {
 	period: {
 		number: 1,
 		secondsTotal: 30 * 60,
-		lastStarted: new Date(1970, 0),
+		lastStarted: 0,
 		secondsLeft: 30 * 60
 	},
 	jam: {
-		lastStarted: new Date(1970, 0),
+		lastStarted: 0,
 		secondsLeft: 30
 	},
 	halftime: {
 		secondsTotal: 15 * 60
-	}
+	},
+	lastUpdated: 0
 };
+
+var Persistence = new (function() {
+	this.saveObject = (key, obj) => localStorage.setItem(key, JSON.stringify(obj));
+	this.getSavedOrDefault = (key, def) => JSON.parse(localStorage.getItem(key) ?? JSON.stringify(def ?? {}));
+})();
 
 var DomState = new (function() {
 	var self = this;
@@ -49,23 +55,22 @@ var DomState = new (function() {
 		$('jamclock').contentEditable = stage === PRE_BOUT;
 		$('periodclock').contentEditable = PERIOD_CLOCK_STOPPED.includes(stage);
 	}
-	this.updateGameState = (state, reset) => {
+	this.updateGameState = (newState, reset) => {
 		reset ??= lastState === null;
 		for (let t = 0; t < 3; t++) {
-			if (reset || lastState.teams[t] !== state.teams[t]) self.setTeam(t + 1, state.teams[t]);
-			if (reset || lastState.score[t] !== state.score[t]) self.setScore(t + 1, state.score[t])
+			if (reset || lastState.teams[t] !== newState.teams[t]) self.setTeam(t + 1, newState.teams[t]);
+			if (reset || lastState.score[t] !== newState.score[t]) self.setScore(t + 1, newState.score[t])
 		}
-		if (reset || lastState.period.number !== state.period.number) self.setPeriodNumber(state.period.number);
-		if (reset || lastState.period.secondsLeft !== state.period.secondsLeft) self.setPeriodClock(state.period.secondsLeft);
-		if (state.stage === PRE_BOUT) {
-			if (reset || lastState.halftime.secondsTotal !== state.halftime.secondsTotal) self.setJamClock(state.halftime.secondsTotal);
+		if (reset || lastState.period.number !== newState.period.number) self.setPeriodNumber(newState.period.number);
+		if (reset || lastState.period.secondsLeft !== newState.period.secondsLeft) self.setPeriodClock(newState.period.secondsLeft);
+		if (newState.stage === PRE_BOUT) {
+			newState.jam.secondsLeft = newState.halftime.secondsTotal;
+			if (reset || lastState.halftime.secondsTotal !== newState.halftime.secondsTotal) self.setJamClock(newState.halftime.secondsTotal);
 		} else {
-			if (reset || lastState.jam.secondsLeft !== state.jam.secondsLeft) self.setJamClock(state.jam.secondsLeft);
+			if (reset || lastState.jam.secondsLeft !== newState.jam.secondsLeft) self.setJamClock(newState.jam.secondsLeft);
 		}
-		if (reset || lastState.stage !== state.stage) self.updateStage(state.stage);
-		lastState = deepCopy(state); // TODO: move deepCopy to GameState and set stuf in newState
-		if (state.stage === PRE_BOUT)
-			lastState.jam.secondsLeft = state.halftime.secondsTotal;
+		if (reset || lastState.stage !== newState.stage) self.updateStage(newState.stage);
+		lastState = newState;
 	}
 	this.setEventListeners = () => {
 		for (let t = 1; t <= 3; t++) {
@@ -96,10 +101,6 @@ var DomState = new (function() {
 		return r.length < 2
 			? parseInt(r.join(''))
 			: parseInt(r[0]) * 60 + parseInt(r[1]);
-	}
-	
-	function deepCopy(obj) {
-		return JSON.parse(JSON.stringify(obj));
 	}
 
 	function setSeconds(id, to) {
@@ -141,9 +142,82 @@ var DomState = new (function() {
 })();
 
 var GameState = new (function(initialState) {
-	var internalState = initialState;
-	
 	var jamTimer, periodTimer;
+	var saveKey = 'savedGameState';
+
+	var internalState = Persistence.getSavedOrDefault(saveKey, initialState);
+	// Parse datetimes from either default 0 or saved string-value
+	internalState.period.lastStarted = new Date(internalState.period.lastStarted);
+	internalState.jam.lastStarted = new Date(internalState.jam.lastStarted);
+	internalState.lastUpdated = new Date(internalState.lastUpdated);
+
+	this.initializeGame = () => {
+		let secondsSinceLastUpdated = Math.floor((new Date() - internalState.lastUpdated) / 1000);
+
+		switch (true) {
+			case (secondsSinceLastUpdated > 60 * 60): // longer than 1 hour ago, only take team names and score
+				let teams = internalState.teams;
+				let score = internalState.score;
+				internalState = deepCopy(initialState);
+				internalState.teams = teams;
+				internalState.score = score;
+			break;
+			case ([PRE_BOUT, END_BOUT, SCORE_OK].includes(internalState.stage)): // game hadn't started yet or was already finished, modify nothing
+			break;
+			case ([OTO, TTO, OR].includes(internalState.stage)): // Time-out, add seconds and continue timing
+				internalState.jam.secondsLeft += secondsSinceLastUpdated;
+				continueJam();
+			break;
+			case ([HALFTIME, LINEUP_AFTER_TO].includes(internalState.stage)
+				&& internalState.jam.secondsLeft > secondsSinceLastUpdated): // Halftime or Line-up after TO and not elapsed yet, subtract seconds and continue timing
+				internalState.jam.secondsLeft -= secondsSinceLastUpdated;
+				continueJam();
+			break;
+			case ([HALFTIME, LINEUP_AFTER_TO].includes(internalState.stage)): // Halftime or Line-up after TO elapsed, set to 0 and don't time
+				internalState.jam.secondsLeft = 0;
+			break;
+			case (!PERIOD_CLOCK_STOPPED.includes(internalState.stage) // Period clock was running and both jam and period have more time than lost since last updated
+				&& Math.min(internalState.period.secondsLeft, internalState.jam.secondsLeft) > secondsSinceLastUpdated): // substract from both clocks and continue timing
+				internalState.period.secondsLeft -= secondsSinceLastUpdated;
+				internalState.jam.secondsLeft -= secondsSinceLastUpdated;
+				continuePeriod();
+				continueJam();
+			break;
+			default: // Default (including more time lost than was available in running period/jam), go to OTO with length since last save
+				internalState.stage = OTO;
+				startTiming(secondsSinceLastUpdated);
+			break;
+		}
+		saveAndUpdateView(true);
+	}
+	this.resetGame = () => {
+		clearInterval(jamTimer);
+		clearInterval(periodTimer);
+
+		// Reset everything back to initialState except team names and period/halftime length
+		let teams = internalState.teams;
+		let periodLength = internalState.period.secondsTotal;
+		let halftimeLength = internalState.halftime.secondsTotal;
+		internalState = deepCopy(initialState);
+		internalState.teams = teams;
+		internalState.period.secondsTotal = periodLength;
+		internalState.halftime.secondsTotal = halftimeLength;
+		saveAndUpdateView(true);
+	}
+	function continueJam() {
+		setTimeout(() => {
+			jamSecondElapsed();
+			jamTimer = setInterval(jamSecondElapsed, 1000);
+		},
+		(new Date() - internalState.jam.lastStarted) % 1000);
+	}
+	function continuePeriod() {
+		setTimeout(() => {
+			periodSecondElapsed();
+			periodTimer = setInterval(periodSecondElapsed, 1000);
+		},
+		(new Date() - internalState.period.lastStarted) % 1000);
+	}
 
 	this.startStopJam = () => {
 		switch (internalState.stage) { // this _was_ the stage when starting/stopping a Jam
@@ -183,7 +257,7 @@ var GameState = new (function(initialState) {
 				internalState.stage = SCORE_OK;
 			break;
 		}
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	this.startTimeOut = () => {
 		switch (internalState.stage) { // this _was_ the stage when starting TimeOut
@@ -213,7 +287,7 @@ var GameState = new (function(initialState) {
 				internalState.jam.secondsLeft = 60 - internalState.jam.secondsLeft;
 			break;
 		}
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	this.startOfficialReview = () => {
 		if (![OTO, TTO].includes(internalState.stage)) {
@@ -223,24 +297,24 @@ var GameState = new (function(initialState) {
 			internalState.jam.secondsLeft = 60 - internalState.jam.secondsLeft;
 		}
 		internalState.stage = OR;
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	this.togglePeriod = () => {
 		internalState.period.number = (internalState.period.number === 1) ? 2 : 1;
-		DomState.setPeriodNumber(internalState.period.number);
+		saveAndUpdateView();
 	}
 	this.addSeconds = (amount) => {
 		let clock = internalState.stage === HALFTIME ? internalState.jam : internalState.period;
 		clock.secondsLeft += amount;
 		if (clock.secondsLeft < 0)
 			clock.secondsLeft = 0;
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	this.updateTeam = (team, name) => {
 		if (team < 1 || team > 3) return;
 		let teamIndex = team - 1;
 		internalState.teams[teamIndex] = name;
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	this.updateScore = (team, newScore) => changeScore(team, newScore, true);
 	this.increaseScore = (team, amount) => changeScore(team, (amount ?? 1));
@@ -255,28 +329,28 @@ var GameState = new (function(initialState) {
 			internalState.score[teamIndex] += amount;
 		if (internalState.score[teamIndex] < 0)
 			internalState.score[teamIndex] = 0;
-		DomState.setScore(team, internalState.score[teamIndex]);
+		saveAndUpdateView();
 	}
 	this.updatePeriodLength = (newLength) => {
 		if (internalState.stage === PRE_BOUT)
 			internalState.period.secondsTotal = newLength;
 		if (PERIOD_CLOCK_STOPPED.includes(internalState.stage))
 			internalState.period.secondsLeft = newLength;
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	this.updateHalftimeLength = (newLength) => {
 		if (internalState.stage !== PRE_BOUT) return;
 		internalState.halftime.secondsTotal = newLength;
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 
-	function startTiming(seconds) {
+	function startTiming(secondsLeft) {
 		// Sets the jamclock to time the next thing (jam, line-up, T/O or halftime)
 		clearInterval(jamTimer);
-		internalState.jam.secondsLeft = seconds;
+		internalState.jam.secondsLeft = secondsLeft;
 		internalState.jam.lastStarted = new Date();
 		jamTimer = setInterval(jamSecondElapsed, 1000);
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	
 	function jamSecondElapsed() {
@@ -286,7 +360,7 @@ var GameState = new (function(initialState) {
 		// if that results in less than 0 seconds, set to 0
 		if (internalState.jam.secondsLeft < 0)
 			internalState.jam.secondsLeft = 0;
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	
 	function periodEnd() {
@@ -301,22 +375,34 @@ var GameState = new (function(initialState) {
 			clearInterval(jamTimer);
 			internalState.stage = END_BOUT;
 		}
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
 	}
 	
 	function periodSecondElapsed() {
 		if (internalState.period.secondsLeft > 0)
 			internalState.period.secondsLeft--;
-		DomState.updateGameState(internalState);
+		saveAndUpdateView();
+	}
+
+	function saveAndUpdateView(reset) {
+		internalState.lastUpdated = new Date();
+		Persistence.saveObject(saveKey, internalState);
+		DomState.updateGameState(deepCopy(internalState), reset);
+	}
+	
+	function deepCopy(obj) {
+		return JSON.parse(JSON.stringify(obj));
 	}
 })(initialState);
 
 window.onload=function() {
-	DomState.updateGameState(initialState, true);
+	GameState.initializeGame();
 	DomState.setEventListeners();
 	window.onkeydown = function(e) {
 		if (e.target.matches('input[type="text"],textarea,[contenteditable="true"]')) return;
 		switch (e.key) {
+			case '`':
+			case '§': GameState.resetGame(); break;
 			case 'r': GameState.increaseScore(1); break;
 			case 'f': GameState.increaseScore(2); break;
 			case 'v': GameState.increaseScore(3); break;
