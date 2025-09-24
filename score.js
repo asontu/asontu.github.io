@@ -203,6 +203,7 @@ var GameState = new (function(initialState) {
 		let halftimeLength = internalState.halftime.secondsTotal;
 		internalState = deepCopy(initialState);
 		internalState.teams = teams;
+		internalState.period.secondsLeft = periodLength;
 		internalState.period.secondsTotal = periodLength;
 		internalState.halftime.secondsTotal = halftimeLength;
 		saveAndUpdateView(true);
@@ -272,15 +273,13 @@ var GameState = new (function(initialState) {
 			case JAM_ON:
 			case END_BOUT:
 			case SCORE_OK:
-				internalState.stage = OTO;
 				clearInterval(periodTimer);
 				startTiming(0);
-			break;
 			case OR:
 				internalState.stage = OTO;
 			break;
 			case OTO:
-				if (internalState.jam.secondsLeft <= 60) {
+				if (internalState.jam.secondsLeft < 60) {
 					internalState.stage = TTO;
 					internalState.jam.secondsLeft = 60 - internalState.jam.secondsLeft;
 				}
@@ -357,7 +356,6 @@ var GameState = new (function(initialState) {
 	}
 	
 	function jamSecondElapsed() {
-		var iSec = internalState.jam.secondsLeft;
 		// substract a second, unless we're in OTO or OR which can last as long as needed
 		internalState.jam.secondsLeft += [OTO, OR].includes(internalState.stage) ? 1 : -1;
 		// if that results in less than 0 seconds, set to 0
@@ -428,10 +426,6 @@ window.onload=function() {
 					let amount = e.ctrlKey ? -1 : 1;
 					amount *= (parseInt(e.key) + 9) % 10 + 1;
 					GameState.addSeconds(amount);
-				} else {
-/*					$('team1').innerText = e.key;
-					$('team2').innerText = e.code;
-					console.log(e); //*/
 				}
 			break;
 		}
