@@ -3,7 +3,7 @@ function $(id) {
 }
 
 var PRE_BOUT = 0;
-var LINEUP_POST_TO = 1;
+var LINEUP_AFTER_TO = 1;
 var LINEUP = 2;
 var JAM_ON = 3;
 var TTO = 4;
@@ -12,6 +12,7 @@ var OR = 6;
 var HALFTIME = 7;
 var END_BOUT = 8;
 var SCORE_OK = 9;
+var PERIOD_CLOCK_STOPPED = [PRE_BOUT, LINEUP_AFTER_TO, OTO, TTO, OR, HALFTIME];
 
 var initialState = {
 	teams: ['Red', 'White', 'Black'],
@@ -46,6 +47,7 @@ var DomState = new (function() {
 		if (document.body.className.indexOf(gameStageClasses[stage]) === -1)
 			document.body.className = gameStageClasses[stage];
 		$('jamclock').contentEditable = stage === PRE_BOUT;
+		$('periodclock').contentEditable = PERIOD_CLOCK_STOPPED.includes(stage);
 	}
 	this.updateGameState = (state, reset) => {
 		reset ??= lastState === null;
@@ -151,31 +153,31 @@ var GameState = new (function(initialState) {
 			case TTO:
 			case OTO:
 			case OR:
-				if (internalState.period.secondsLeft > 0) {
-					internalState.stage = LINEUP_POST_TO;
-					startTiming(30);
-				} else {
+				if (internalState.period.secondsLeft <= 0) {
 					periodEnd();
+					return;
 				}
+				internalState.stage = LINEUP_AFTER_TO;
+				startTiming(30);
 			break;
-			case LINEUP_POST_TO:
+			case LINEUP_AFTER_TO:
 				internalState.period.lastStarted = new Date();
 				periodTimer = setInterval(periodSecondElapsed, 1000);
 			case LINEUP:
-				if (internalState.period.secondsLeft > 0) {
-					internalState.stage = JAM_ON;
-					startTiming(120);
-				} else {
+				if (internalState.period.secondsLeft <= 0) {
 					periodEnd();
+					return;
 				}
+				internalState.stage = JAM_ON;
+				startTiming(120);
 			break;
 			case JAM_ON:
-				if (internalState.period.secondsLeft > 0) {
-					internalState.stage = LINEUP;
-					startTiming(30);
-				} else {
+				if (internalState.period.secondsLeft <= 0) {
 					periodEnd();
+					return;
 				}
+				internalState.stage = LINEUP;
+				startTiming(30);
 			break;
 			case END_BOUT:
 				internalState.stage = SCORE_OK;
@@ -188,7 +190,7 @@ var GameState = new (function(initialState) {
 			case HALFTIME:
 				internalState.period.number = 1;
 				internalState.period.secondsLeft = 0;
-			case LINEUP_POST_TO:
+			case LINEUP_AFTER_TO:
 			case LINEUP:
 			case JAM_ON:
 			case END_BOUT:
@@ -214,7 +216,7 @@ var GameState = new (function(initialState) {
 		DomState.updateGameState(internalState);
 	}
 	this.startOfficialReview = () => {
-		if (internalState.stage !== OTO && internalState.stage !== TTO) {
+		if (![OTO, TTO].includes(internalState.stage)) {
 			return;
 		}
 		if (internalState.stage === TTO) {
@@ -229,9 +231,9 @@ var GameState = new (function(initialState) {
 	}
 	this.addSeconds = (amount) => {
 		let clock = internalState.stage === HALFTIME ? internalState.jam : internalState.period;
-		amount += clock.secondsLeft;
-		if (amount >= 0)
-			clock.secondsLeft = amount;
+		clock.secondsLeft += amount;
+		if (clock.secondsLeft < 0)
+			clock.secondsLeft = 0;
 		DomState.updateGameState(internalState);
 	}
 	this.updateTeam = (team, name) => {
@@ -258,7 +260,7 @@ var GameState = new (function(initialState) {
 	this.updatePeriodLength = (newLength) => {
 		if (internalState.stage === PRE_BOUT)
 			internalState.period.secondsTotal = newLength;
-		if ([PRE_BOUT, LINEUP_POST_TO, OTO, TTO, OR, HALFTIME].includes(internalState.stage))
+		if (PERIOD_CLOCK_STOPPED.includes(internalState.stage))
 			internalState.period.secondsLeft = newLength;
 		DomState.updateGameState(internalState);
 	}
@@ -280,7 +282,7 @@ var GameState = new (function(initialState) {
 	function jamSecondElapsed() {
 		var iSec = internalState.jam.secondsLeft;
 		// substract a second, unless we're in OTO or OR which can last as long as needed
-		internalState.jam.secondsLeft += internalState.stage === OTO || internalState.stage === OR ? 1 : -1;
+		internalState.jam.secondsLeft += [OTO, OR].includes(internalState.stage) ? 1 : -1;
 		// if that results in less than 0 seconds, set to 0
 		if (internalState.jam.secondsLeft < 0)
 			internalState.jam.secondsLeft = 0;
