@@ -52,8 +52,11 @@ var DomState = new (function() {
 		$('now').innerText = gameStageTexts[stage];
 		if (document.body.className.indexOf(gameStageClasses[stage]) === -1)
 			document.body.className = gameStageClasses[stage];
-		$('jamclock').contentEditable = stage === PRE_BOUT;
-		$('periodclock').contentEditable = PERIOD_CLOCK_STOPPED.includes(stage);
+		$('jamclock').contentEditable = editable(stage === PRE_BOUT);
+		$('periodclock').contentEditable = editable(PERIOD_CLOCK_STOPPED.includes(stage));
+	}
+	function editable(bool) {
+		return bool ? 'plaintext-only' : 'false';
 	}
 	this.updateGameState = (newState, reset) => {
 		reset ??= lastState === null;
@@ -399,7 +402,7 @@ window.onload=function() {
 	GameState.initializeGame();
 	DomState.setEventListeners();
 	window.onkeydown = function(e) {
-		if (e.target.matches('input[type="text"],textarea,[contenteditable="true"]')) return;
+		if (e.target.matches('input[type="text"],textarea,[contenteditable="plaintext-only"]')) return;
 		switch (e.key) {
 			case '`':
 			case '§': GameState.resetGame(); break;
