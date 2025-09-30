@@ -397,40 +397,130 @@ var GameState = new (function(initialState) {
 	}
 })(initialState);
 
+var HotKeys = new (function() {
+	const defaultHotKeys = {
+		'?': 'toggleHelp',
+		'shift+?': 'toggleHelp',
+		'ctrl+escape': 'resetGame',
+		' ': 'startStopJam',
+		'escape': 'startTimeOut',
+		'o': 'startOfficialReview',
+		'p': 'togglePeriod',
+		'r': 'increaseScore1by1',
+		'f': 'increaseScore2by1',
+		'v': 'increaseScore3by1',
+		't': 'increaseScore1by6',
+		'g': 'increaseScore2by6',
+		'b': 'increaseScore3by6',
+		'e': 'decreaseScore1by1',
+		'd': 'decreaseScore2by1',
+		'c': 'decreaseScore3by1',
+		'w': 'decreaseScore1by6',
+		's': 'decreaseScore2by6',
+		'x': 'decreaseScore3by6',
+		'1': 'increasePeriodBy1',
+		'2': 'increasePeriodBy2',
+		'3': 'increasePeriodBy3',
+		'4': 'increasePeriodBy4',
+		'5': 'increasePeriodBy5',
+		'6': 'increasePeriodBy6',
+		'7': 'increasePeriodBy7',
+		'8': 'increasePeriodBy8',
+		'9': 'increasePeriodBy9',
+		'0': 'increasePeriodBy10',
+		'shift+1': 'decreasePeriodBy1',
+		'shift+2': 'decreasePeriodBy2',
+		'shift+3': 'decreasePeriodBy3',
+		'shift+4': 'decreasePeriodBy4',
+		'shift+5': 'decreasePeriodBy5',
+		'shift+6': 'decreasePeriodBy6',
+		'shift+7': 'decreasePeriodBy7',
+		'shift+8': 'decreasePeriodBy8',
+		'shift+9': 'decreasePeriodBy9',
+		'shift+0': 'decreasePeriodBy10',
+	};
+	var hotKeys = Persistence.getSavedOrDefault('hotKeyPreferences', defaultHotKeys);
+	this.setEventListeners = () => {
+		window.addEventListener('keydown', function(e) {
+			if (e.target.matches('input[type="text"],input[type="password"],textarea,[contenteditable="plaintext-only"],[contenteditable="true"]'))
+				return;
+
+			let keyInfo = getKeyInfo(e);
+			if (!keyInfo || !Object.hasOwn(hotKeys, keyInfo.string))
+				return;
+
+			switch (hotKeys[keyInfo.string]) {
+				case 'toggleHelp': DomState.toggleHelp(); break;
+				case 'resetGame': GameState.resetGame(); break;
+				case 'startStopJam': GameState.startStopJam(); break;
+				case 'startTimeOut': GameState.startTimeOut(); break;
+				case 'startOfficialReview': GameState.startOfficialReview(); break;
+				case 'togglePeriod': GameState.togglePeriod(); break;
+				case 'increaseScore1by1': GameState.increaseScore(1); break;
+				case 'increaseScore2by1': GameState.increaseScore(2); break;
+				case 'increaseScore3by1': GameState.increaseScore(3); break;
+				case 'increaseScore1by6': GameState.increaseScore(1, 6); break;
+				case 'increaseScore2by6': GameState.increaseScore(2, 6); break;
+				case 'increaseScore3by6': GameState.increaseScore(3, 6); break;
+				case 'decreaseScore1by1': GameState.decreaseScore(1); break;
+				case 'decreaseScore2by1': GameState.decreaseScore(2); break;
+				case 'decreaseScore3by1': GameState.decreaseScore(3); break;
+				case 'decreaseScore1by6': GameState.decreaseScore(1, 6); break;
+				case 'decreaseScore2by6': GameState.decreaseScore(2, 6); break;
+				case 'decreaseScore3by6': GameState.decreaseScore(3, 6); break;
+				case 'increasePeriodBy1': GameState.addSeconds(1); break;
+				case 'increasePeriodBy2': GameState.addSeconds(2); break;
+				case 'increasePeriodBy3': GameState.addSeconds(3); break;
+				case 'increasePeriodBy4': GameState.addSeconds(4); break;
+				case 'increasePeriodBy5': GameState.addSeconds(5); break;
+				case 'increasePeriodBy6': GameState.addSeconds(6); break;
+				case 'increasePeriodBy7': GameState.addSeconds(7); break;
+				case 'increasePeriodBy8': GameState.addSeconds(8); break;
+				case 'increasePeriodBy9': GameState.addSeconds(9); break;
+				case 'increasePeriodBy10': GameState.addSeconds(10); break;
+				case 'decreasePeriodBy1': GameState.addSeconds(-1); break;
+				case 'decreasePeriodBy2': GameState.addSeconds(-2); break;
+				case 'decreasePeriodBy3': GameState.addSeconds(-3); break;
+				case 'decreasePeriodBy4': GameState.addSeconds(-4); break;
+				case 'decreasePeriodBy5': GameState.addSeconds(-5); break;
+				case 'decreasePeriodBy6': GameState.addSeconds(-6); break;
+				case 'decreasePeriodBy7': GameState.addSeconds(-7); break;
+				case 'decreasePeriodBy8': GameState.addSeconds(-8); break;
+				case 'decreasePeriodBy9': GameState.addSeconds(-9); break;
+				case 'decreasePeriodBy10': GameState.addSeconds(-10); break;
+				default:
+					return; // Don't prevent default
+			}
+			e.preventDefault();
+			return false;
+		});
+	}
+
+	function getKeyInfo(e) {
+		if (e.key.length > 1 && e.key !== e.code) return false;
+		let info = {
+			key: e.key.toLowerCase(),
+			ctrl: e.ctrlKey,
+			alt: e.altKey,
+			shift: e.shiftKey,
+			meta: e.metaKey
+		};
+		if (e.code.substring(0, 3) === 'Key') {
+			info.key = e.code.charAt(3).toLowerCase();
+		}
+		if (e.code.substring(0, 5) === 'Digit') {
+			info.key = e.code.charAt(5);
+		}
+		info.string = ['ctrl', 'alt', 'shift', 'meta']
+			.filter(modifier => info[modifier])
+			.concat([info.key])
+			.join('+');
+		return info;
+	}
+})();
+
 window.onload=function() {
 	GameState.initializeGame();
 	DomState.setEventListeners();
-	window.onkeydown = function(e) {
-		if (e.target.matches('input[type="text"],textarea,[contenteditable="plaintext-only"]')) return;
-		switch (e.key) {
-			case '`':
-			case '§': GameState.resetGame(); break;
-			case 'r': GameState.increaseScore(1); break;
-			case 'f': GameState.increaseScore(2); break;
-			case 'v': GameState.increaseScore(3); break;
-			case 't': GameState.increaseScore(1, 6); break;
-			case 'g': GameState.increaseScore(2, 6); break;
-			case 'b': GameState.increaseScore(3, 6); break;
-			case 'e': GameState.decreaseScore(1); break;
-			case 'd': GameState.decreaseScore(2); break;
-			case 'c': GameState.decreaseScore(3); break;
-			case 'w': GameState.decreaseScore(1, 6); break;
-			case 's': GameState.decreaseScore(2, 6); break;
-			case 'x': GameState.decreaseScore(3, 6); break;
-			case ' ': GameState.startStopJam(); break;
-			case 'Escape': GameState.startTimeOut(); break;
-			case 'o': GameState.startOfficialReview(); break;
-			case 'p': GameState.togglePeriod(); break;
-			case '?': DomState.toggleHelp(); break;
-			default:
-				if (!isNaN(e.key)) {
-					let amount = e.ctrlKey ? -1 : 1;
-					amount *= (parseInt(e.key) + 9) % 10 + 1;
-					GameState.addSeconds(amount);
-				}
-			break;
-		}
-		e.preventDefault();
-		return false;
-	}
+	HotKeys.setEventListeners();
 }
