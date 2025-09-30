@@ -14,26 +14,6 @@ const END_BOUT = 8;
 const SCORE_OK = 9;
 const PERIOD_CLOCK_STOPPED = [PRE_BOUT, LINEUP_AFTER_TO, OTO, TTO, OR, HALFTIME];
 
-const initialState = {
-	teams: ['Red', 'White', 'Black'],
-	score: [0, 0, 0],
-	stage: PRE_BOUT,
-	period: {
-		number: 1,
-		secondsTotal: 30 * 60,
-		lastStarted: 0,
-		secondsLeft: 30 * 60
-	},
-	jam: {
-		lastStarted: 0,
-		secondsLeft: 30
-	},
-	halftime: {
-		secondsTotal: 15 * 60
-	},
-	lastUpdated: 0
-};
-
 var Persistence = new (function() {
 	this.saveObject = (key, obj) => localStorage.setItem(key, JSON.stringify(obj));
 	this.getSavedOrDefault = (key, def) => JSON.parse(localStorage.getItem(key) ?? JSON.stringify(def ?? {}));
@@ -144,7 +124,27 @@ var DomState = new (function() {
 	];
 })();
 
-var GameState = new (function(initialState) {
+var GameState = new (function() {
+	const initialState = {
+		teams: ['Red', 'White', 'Black'],
+		score: [0, 0, 0],
+		stage: PRE_BOUT,
+		period: {
+			number: 1,
+			secondsTotal: 30 * 60,
+			lastStarted: 0,
+			secondsLeft: 30 * 60
+		},
+		jam: {
+			lastStarted: 0,
+			secondsLeft: 30
+		},
+		halftime: {
+			secondsTotal: 15 * 60
+		},
+		lastUpdated: 0
+	};
+
 	var jamTimer, periodTimer;
 	var saveKey = 'savedGameState';
 
@@ -395,7 +395,7 @@ var GameState = new (function(initialState) {
 	function deepCopy(obj) {
 		return JSON.parse(JSON.stringify(obj));
 	}
-})(initialState);
+})();
 
 var HotKeys = new (function() {
 	const defaultHotKeys = {
