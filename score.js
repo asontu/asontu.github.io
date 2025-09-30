@@ -2,19 +2,19 @@ function $(id) {
 	return document.getElementById(id);
 }
 
-var PRE_BOUT = 0;
-var LINEUP_AFTER_TO = 1;
-var LINEUP = 2;
-var JAM_ON = 3;
-var TTO = 4;
-var OTO = 5;
-var OR = 6;
-var HALFTIME = 7;
-var END_BOUT = 8;
-var SCORE_OK = 9;
-var PERIOD_CLOCK_STOPPED = [PRE_BOUT, LINEUP_AFTER_TO, OTO, TTO, OR, HALFTIME];
+const PRE_BOUT = 0;
+const LINEUP_AFTER_TO = 1;
+const LINEUP = 2;
+const JAM_ON = 3;
+const TTO = 4;
+const OTO = 5;
+const OR = 6;
+const HALFTIME = 7;
+const END_BOUT = 8;
+const SCORE_OK = 9;
+const PERIOD_CLOCK_STOPPED = [PRE_BOUT, LINEUP_AFTER_TO, OTO, TTO, OR, HALFTIME];
 
-var initialState = {
+const initialState = {
 	teams: ['Red', 'White', 'Black'],
 	score: [0, 0, 0],
 	stage: PRE_BOUT,
@@ -194,6 +194,7 @@ var GameState = new (function(initialState) {
 		saveAndUpdateView(true);
 	}
 	this.resetGame = () => {
+		if (!confirm('Reset the game?\nThis keeps only the team names and period & halftime lengths')) return;
 		clearInterval(jamTimer);
 		clearInterval(periodTimer);
 
@@ -209,14 +210,14 @@ var GameState = new (function(initialState) {
 		saveAndUpdateView(true);
 	}
 	function continueJam() {
-		setTimeout(() => {
+		jamTimer = setTimeout(() => {
 			jamSecondElapsed();
 			jamTimer = setInterval(jamSecondElapsed, 1000);
 		},
 		(new Date() - internalState.jam.lastStarted) % 1000);
 	}
 	function continuePeriod() {
-		setTimeout(() => {
+		periodTimer = setTimeout(() => {
 			periodSecondElapsed();
 			periodTimer = setInterval(periodSecondElapsed, 1000);
 		},
