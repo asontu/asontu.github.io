@@ -519,8 +519,8 @@ var HotKeys = new (function() {
 	}
 })();
 
-window.onload=function() {
+document.addEventListener("DOMContentLoaded", function() {
 	GameState.initializeGame();
 	DomState.setEventListeners();
 	HotKeys.setEventListeners();
-}
+});
