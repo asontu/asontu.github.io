@@ -17,6 +17,7 @@ const PERIOD_CLOCK_STOPPED = [PRE_BOUT, LINEUP_AFTER_TO, OTO, TTO, OR, HALFTIME]
 var Persistence = new (function() {
 	this.saveObject = (key, obj) => localStorage.setItem(key, JSON.stringify(obj));
 	this.getSavedOrDefault = (key, def) => JSON.parse(localStorage.getItem(key) ?? JSON.stringify(def ?? {}));
+	this.removeObject = (key) => localStorage.removeItem(key);
 })();
 
 var DomState = new (function() {
@@ -145,8 +146,11 @@ var GameState = new (function() {
 		lastUpdated: 0
 	};
 
+	var self = this;
 	var jamTimer, periodTimer;
 	var saveKey = 'savedGameState';
+	var undoKey = 'undoStack';
+	var redoKey = 'redoStack';
 
 	var internalState = Persistence.getSavedOrDefault(saveKey, initialState);
 	// Parse datetimes from either default 0 or saved string-value
@@ -158,12 +162,14 @@ var GameState = new (function() {
 		let secondsSinceLastUpdated = Math.floor((new Date() - internalState.lastUpdated) / 1000);
 
 		switch (true) {
-			case (secondsSinceLastUpdated > 60 * 60): // longer than 1 hour ago, only take team names and score
+			case (secondsSinceLastUpdated > 3600): // longer than 1 hour ago, only take team names and score
 				let teams = internalState.teams;
 				let score = internalState.score;
 				internalState = deepCopy(initialState);
 				internalState.teams = teams;
 				internalState.score = score;
+				Persistence.removeObject(undoKey);
+				Persistence.removeObject(redoKey);
 			break;
 			case ([PRE_BOUT, END_BOUT, SCORE_OK].includes(internalState.stage)): // game hadn't started yet or was already finished, modify nothing
 			break;
@@ -193,10 +199,28 @@ var GameState = new (function() {
 		}
 		saveAndUpdateView(true);
 	}
+	this.undoLastStep = () => {
+		let undoStack = Persistence.getSavedOrDefault(undoKey, []);
+		if (undoStack.length === 0) return;
+		clearInterval(jamTimer);
+		clearInterval(periodTimer);
+		saveUndo(redoKey, internalState);
+		let applyState = undoStack.pop();
+		Persistence.saveObject(undoKey, undoStack);
+		internalState.stage = applyState.stage;
+		internalState.period = applyState.period;
+		internalState.period.lastStarted = new Date(internalState.period.lastStarted);
+		internalState.jam = applyState.jam;
+		internalState.jam.lastStarted = new Date(internalState.jam.lastStarted);
+		internalState.lastUpdated = new Date(applyState.lastUpdated);
+		self.initializeGame();
+	}
 	this.resetGame = () => {
 		if (!confirm('Reset the game?\nThis keeps only the team names and period & halftime lengths')) return;
 		clearInterval(jamTimer);
 		clearInterval(periodTimer);
+		Persistence.removeObject(undoKey);
+		Persistence.removeObject(redoKey);
 
 		// Reset everything back to initialState except team names and period/halftime length
 		let teams = internalState.teams;
@@ -225,6 +249,7 @@ var GameState = new (function() {
 	}
 
 	this.startStopJam = () => {
+		saveUndo(undoKey, internalState);
 		switch (internalState.stage) { // this _was_ the stage when starting/stopping a Jam
 			case PRE_BOUT:
 				internalState.period.secondsLeft = internalState.period.secondsTotal;
@@ -265,6 +290,7 @@ var GameState = new (function() {
 		saveAndUpdateView();
 	}
 	this.startTimeOut = () => {
+		saveUndo(undoKey, internalState);
 		switch (internalState.stage) { // this _was_ the stage when starting TimeOut
 			case HALFTIME:
 				internalState.period.number = 1;
@@ -293,6 +319,7 @@ var GameState = new (function() {
 		saveAndUpdateView();
 	}
 	this.startOfficialReview = () => {
+		saveUndo(undoKey, internalState);
 		if (![OTO, TTO].includes(internalState.stage)) {
 			return;
 		}
@@ -303,6 +330,7 @@ var GameState = new (function() {
 		saveAndUpdateView();
 	}
 	this.togglePeriod = () => {
+		saveUndo(undoKey, internalState);
 		internalState.period.number = (internalState.period.number === 1) ? 2 : 1;
 		saveAndUpdateView();
 	}
@@ -386,6 +414,23 @@ var GameState = new (function() {
 		saveAndUpdateView();
 	}
 
+	function saveUndo(key, state) {
+		let undoStack = Persistence.getSavedOrDefault(key, []);
+		undoStack.push(deepCopy({
+			stage: state.stage,
+			period: state.period,
+			jam: state.jam,
+			lastUpdated: state.lastUpdated
+		}));
+		if (undoStack.length > 10) {
+			undoStack.shift();
+		}
+		Persistence.saveObject(key, undoStack);
+		if (key === undoKey) {
+			Persistence.removeObject(redoKey);
+		}
+	}
+
 	function saveAndUpdateView(reset) {
 		internalState.lastUpdated = new Date();
 		Persistence.saveObject(saveKey, internalState);
@@ -406,6 +451,7 @@ var HotKeys = new (function() {
 		'escape': 'startTimeOut',
 		'o': 'startOfficialReview',
 		'p': 'togglePeriod',
+		'ctrl+z': 'undoLastStep',
 		'r': 'increaseScore1by1',
 		'f': 'increaseScore2by1',
 		'v': 'increaseScore3by1',
@@ -456,6 +502,7 @@ var HotKeys = new (function() {
 				case 'startTimeOut': GameState.startTimeOut(); break;
 				case 'startOfficialReview': GameState.startOfficialReview(); break;
 				case 'togglePeriod': GameState.togglePeriod(); break;
+				case 'undoLastStep': GameState.undoLastStep(); break;
 				case 'increaseScore1by1': GameState.increaseScore(1); break;
 				case 'increaseScore2by1': GameState.increaseScore(2); break;
 				case 'increaseScore3by1': GameState.increaseScore(3); break;
