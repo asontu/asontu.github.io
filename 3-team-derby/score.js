@@ -173,16 +173,16 @@ var GameState = new (function() {
 			break;
 			case ([PRE_BOUT, END_BOUT, SCORE_OK].includes(internalState.stage)): // game hadn't started yet or was already finished, modify nothing
 			break;
-			case ([OTO, TTO, OR].includes(internalState.stage)): // Time-out, add seconds and continue timing
+			case ([OTO, OR].includes(internalState.stage)): // Official Time-out/Review, add seconds and continue timing
 				internalState.jam.secondsLeft += secondsSinceLastUpdated;
 				continueJam();
 			break;
-			case ([HALFTIME, LINEUP_AFTER_TO].includes(internalState.stage)
-				&& internalState.jam.secondsLeft > secondsSinceLastUpdated): // Halftime or Line-up after TO and not elapsed yet, subtract seconds and continue timing
+			case ([TTO, HALFTIME, LINEUP_AFTER_TO].includes(internalState.stage)
+				&& internalState.jam.secondsLeft > secondsSinceLastUpdated): // Team time-out, Halftime or Line-up after TO and not elapsed yet, subtract seconds and continue timing
 				internalState.jam.secondsLeft -= secondsSinceLastUpdated;
 				continueJam();
 			break;
-			case ([HALFTIME, LINEUP_AFTER_TO].includes(internalState.stage)): // Halftime or Line-up after TO elapsed, set to 0 and don't time
+			case ([TTO, HALFTIME, LINEUP_AFTER_TO].includes(internalState.stage)): // Team time-out, Halftime or Line-up after TO elapsed, set to 0 and don't time
 				internalState.jam.secondsLeft = 0;
 			break;
 			case (!PERIOD_CLOCK_STOPPED.includes(internalState.stage) // Period clock was running and both jam and period have more time than lost since last updated
