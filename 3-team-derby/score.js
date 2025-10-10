@@ -199,14 +199,16 @@ var GameState = new (function() {
 		}
 		saveAndUpdateView(true);
 	}
-	this.undoLastStep = () => {
-		let undoStack = Persistence.getSavedOrDefault(undoKey, []);
+	this.undoLastStep = () => applyUndo(undoKey, redoKey);
+	this.redoLastUndo = () => applyUndo(redoKey, undoKey);
+	function applyUndo(key, otherKey) {
+		let undoStack = Persistence.getSavedOrDefault(key, []);
 		if (undoStack.length === 0) return;
 		clearInterval(jamTimer);
 		clearInterval(periodTimer);
-		saveUndo(redoKey, internalState);
+		saveUndo(otherKey, internalState);
 		let applyState = undoStack.pop();
-		Persistence.saveObject(undoKey, undoStack);
+		Persistence.saveObject(key, undoStack);
 		internalState.stage = applyState.stage;
 		internalState.period = applyState.period;
 		internalState.period.lastStarted = new Date(internalState.period.lastStarted);
@@ -452,6 +454,9 @@ var HotKeys = new (function() {
 		'o': 'startOfficialReview',
 		'p': 'togglePeriod',
 		'ctrl+z': 'undoLastStep',
+		'meta+z': 'undoLastStep',
+		'ctrl+shift+z': 'redoLastUndo',
+		'shift+meta+z': 'redoLastUndo',
 		'r': 'increaseScore1by1',
 		'f': 'increaseScore2by1',
 		'v': 'increaseScore3by1',
@@ -503,6 +508,7 @@ var HotKeys = new (function() {
 				case 'startOfficialReview': GameState.startOfficialReview(); break;
 				case 'togglePeriod': GameState.togglePeriod(); break;
 				case 'undoLastStep': GameState.undoLastStep(); break;
+				case 'redoLastUndo': GameState.redoLastUndo(); break;
 				case 'increaseScore1by1': GameState.increaseScore(1); break;
 				case 'increaseScore2by1': GameState.increaseScore(2); break;
 				case 'increaseScore3by1': GameState.increaseScore(3); break;
