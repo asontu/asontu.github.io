@@ -4,7 +4,7 @@ html, body {
 	padding: 0;
 	margin: 0;
 	border: 0;
-	background: linear-gradient(#000 60%, #777);
+	background: linear-gradient(#000 60%, #777) fixed;
 	color: #fff;
 	font-family: Helvetica, sans-serif;
 	font-weight: 100;
