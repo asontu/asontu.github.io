@@ -1,0 +1,247 @@
+html, body {
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	border: 0;
+	background: linear-gradient(#000 60%, #777) fixed;
+	color: #fff;
+	font-family: Helvetica, sans-serif;
+	font-weight: 100;
+}
+
+.hidden {
+	display: none;
+}
+
+.teams, .scores {
+	display: flex;
+	width: 100%;
+	justify-content: space-around;
+}
+
+.teams > div {
+	flex: 1;
+	text-align: center;
+	font-size: 9vw;
+}
+
+.scores > div {
+	width: 31vw;
+	height: 20vw;
+	line-height: 20vw;
+	border-radius: 3vw;
+	background: #ddd;
+	color: black;
+	text-align: center;
+	font-size: 20vw;
+	letter-spacing: -1.5vw;
+	text-indent: -1.5vw;
+}
+
+.game-state {
+	margin-top: 5vw;
+	display: flex;
+	width: 100%;
+	justify-content: space-evenly;
+}
+
+#period-info,
+#jamclock {
+	max-height: 20vw;
+}
+
+:not(.setup) .game-state,
+:not(.setup) .game-state div {
+	transition: all .4s ease-in-out;
+}
+
+.game-state > div {
+	width: 40vw;
+	border-radius: 2vw;
+	overflow: hidden;
+}
+
+.game-state > #period-info > div {
+	width: 40vw;
+}
+
+.time-out #period-info,
+.time-out #period-info div {
+	width: 30vw;
+}
+.time-out #jam-info {
+	width: 50vw;
+}
+
+.end #period-info {
+	overflow: hidden;
+	width: 0;
+	opacity: 0;
+}
+.end #period-info div,
+.lineup #period-info div {
+	width: 40vw;
+}
+.end #jam-info {
+	width: 80vw;
+	margin-left: -10vw;
+}
+
+.score .game-state {
+	margin-top: 10vw;
+}
+.score #now {
+	font-size: 8vw;
+}
+.score #period-info,
+.score #jamclock {
+	max-height: 0;
+}
+
+.info {
+	padding: .2vw 0 .8vw;
+	font-size: 5vw;
+	text-align: center;
+	background: linear-gradient(#444, #222);
+}
+
+.time {
+	overflow: hidden;
+	font-size: 10vw;
+	line-height: 10vw;
+	text-align: center;
+	background: #ddd;
+	color: black;
+}
+.time:not(:focus-within) span {
+	position: relative;
+	top: -.8vw;
+}
+
+#help-background {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, .5);
+}
+#help {
+	position: fixed;
+	inset: 8vw;
+	overflow: auto;
+	padding: 1em;
+	border-radius: 3vw;
+	border: 1px solid #777;
+	background: linear-gradient(#000 60%, #777) fixed;
+}
+#help table {
+	clear: both;
+	border-collapse: collapse;
+}
+#help td, #help th {
+	border: 1px solid #999;
+	padding: 3px;
+}
+#help b {
+	font-weight: 700;
+}
+th {
+	vertical-align: top;
+}
+
+#keyboard {
+	position: relative;
+	float: right;
+	margin: 10em 10em 1em 1em;
+}
+#keyboard::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 5em;
+	background: linear-gradient(to left, #000 25%, transparent);
+
+}
+#keyboard > div {
+	margin-top: 4px;
+}
+#keyboard button {
+	position: relative;
+	line-height: 1.2em;
+}
+#keyboard div:not(:last-of-type) button:not(:first-of-type):not(.keep-size) {
+	width: 2em;
+	padding: 1px 0;
+}
+#keyboard button::before {
+	content: attr(data-key);
+}
+#keyboard button[data-key^=F]:not([data-key=F]) {
+	padding: 1px 2px;
+}
+#keyboard button[data-key^=F1]:not([data-key=F1]) {
+	padding: 1px 0 !important;
+}
+#keyboard button[data-key=I] {
+	width: 1.8em;
+}
+#keyboard button[data-key=Space] {
+	width: 13em;
+	color: transparent;
+}
+#keyboard button:not(.number):not(.team):not([data-explanation]) {
+	opacity: .5;
+}
+#keyboard button[data-explanation]::after { 
+	content: attr(data-explanation);
+	position: absolute;
+	z-index: 100;
+	top: -1.3em;
+	white-space: nowrap;
+	padding: 3px 4px;
+	color: #000;
+	background: yellow;
+	border: 1px solid #000;
+	border-radius: 4px;
+	transform-origin: bottom left;
+	transform: rotate(-35deg);
+}
+#keyboard button[data-key='8'][data-explanation]::after{
+	transform: rotate(-30deg);
+}
+#keyboard button[data-key=Esc][data-explanation]::after,
+#keyboard button[data-key=Space][data-explanation]::after {
+	transform: rotate(-15deg);
+}
+#keyboard button[data-key=Space][data-explanation] {
+	text-align: right;
+}
+#keyboard button[data-explanation^=Team]::after {
+	transform: none;
+	top: -2px;
+	left: -2px;
+}
+#keyboard:has(.number:hover) .number,
+#keyboard:has(.number:hover) .number::after,
+#keyboard:has(.add-1:hover) .add-1,
+#keyboard:has(.add-1:hover) .add-1::after,
+#keyboard:has(.add-6:hover) .add-6,
+#keyboard:has(.add-6:hover) .add-6::after,
+#keyboard:has(.subtract-1:hover) .subtract-1,
+#keyboard:has(.subtract-1:hover) .subtract-1::after,
+#keyboard:has(.subtract-6:hover) .subtract-6,
+#keyboard:has(.subtract-6:hover) .subtract-6::after,
+#keyboard button[data-explanation]:not([data-explanation^=Team]):hover,
+#keyboard button[data-explanation]:not([data-explanation^=Team]):hover::after {
+	z-index: 101;
+	outline: 2px solid white;
+}
+#keyboard:has(.team.a:hover) .team.a:not([data-explanation^=Team]),
+#keyboard:has(.team.a:hover) .team.a[data-explanation^=Team]::after,
+#keyboard:has(.team.b:hover) .team.b:not([data-explanation^=Team]),
+#keyboard:has(.team.b:hover) .team.b[data-explanation^=Team]::after,
+#keyboard:has(.team.c:hover) .team.c:not([data-explanation^=Team]),
+#keyboard:has(.team.c:hover) .team.c[data-explanation^=Team]::after {
+	outline: 2px solid white;
+}
