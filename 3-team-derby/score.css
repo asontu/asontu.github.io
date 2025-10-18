@@ -147,6 +147,9 @@ html, body {
 th {
 	vertical-align: top;
 }
+.nowrap {
+	white-space: nowrap;
+}
 
 #keyboard {
 	position: relative;
