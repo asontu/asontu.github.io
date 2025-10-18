@@ -451,8 +451,7 @@ var HotKeys = new (function() {
 	const defaultHotKeys = {
 		'?': 'toggleHelp',
 		'shift+?': 'toggleHelp',
-		'alt+escape': 'resetGame',
-		'meta+escape': 'resetGame',
+		'ctrl+shift+meta+escape': 'resetGame',
 		' ': 'startStopJam',
 		'escape': 'startTimeOut',
 		'o': 'startOfficialReview',
