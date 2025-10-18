@@ -119,19 +119,129 @@ html, body {
 	top: -.8vw;
 }
 
-#help {
-	position: absolute;
+#help-background {
+	position: fixed;
 	inset: 0;
+	background: rgba(0, 0, 0, .5);
+}
+#help {
+	position: fixed;
+	inset: 8vw;
+	overflow: auto;
 	padding: 1em;
-	background: #000;
+	border-radius: 3vw;
+	border: 1px solid #777;
+	background: linear-gradient(#000 60%, #777) fixed;
 }
 #help table {
+	clear: both;
 	border-collapse: collapse;
 }
 #help td, #help th {
 	border: 1px solid #999;
 	padding: 3px;
 }
+#help b {
+	font-weight: 700;
+}
 th {
 	vertical-align: top;
+}
+
+#keyboard {
+	position: relative;
+	float: right;
+	margin: 10em 10em 1em 1em;
+}
+#keyboard::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: 5em;
+	background: linear-gradient(to left, #000 25%, transparent);
+
+}
+#keyboard > div {
+	margin-top: 4px;
+}
+#keyboard button {
+	position: relative;
+	line-height: 1.2em;
+}
+#keyboard div:not(:last-of-type) button:not(:first-of-type):not(.keep-size) {
+	width: 2em;
+	padding: 1px 0;
+}
+#keyboard button::before {
+	content: attr(data-key);
+}
+#keyboard button[data-key^=F]:not([data-key=F]) {
+	padding: 1px 2px;
+}
+#keyboard button[data-key^=F1]:not([data-key=F1]) {
+	padding: 1px 0 !important;
+}
+#keyboard button[data-key=I] {
+	width: 1.8em;
+}
+#keyboard button[data-key=Space] {
+	width: 13em;
+	color: transparent;
+}
+#keyboard button:not(.number):not(.team):not([data-explanation]) {
+	opacity: .5;
+}
+#keyboard button[data-explanation]::after { 
+	content: attr(data-explanation);
+	position: absolute;
+	z-index: 100;
+	top: -1.3em;
+	white-space: nowrap;
+	padding: 3px 4px;
+	color: #000;
+	background: yellow;
+	border: 1px solid #000;
+	border-radius: 4px;
+	transform-origin: bottom left;
+	transform: rotate(-35deg);
+}
+#keyboard button[data-key='8'][data-explanation]::after{
+	transform: rotate(-30deg);
+}
+#keyboard button[data-key=Esc][data-explanation]::after,
+#keyboard button[data-key=Space][data-explanation]::after {
+	transform: rotate(-15deg);
+}
+#keyboard button[data-key=Space][data-explanation] {
+	text-align: right;
+}
+#keyboard button[data-explanation^=Team]::after {
+	transform: none;
+	top: -2px;
+	left: -2px;
+}
+#keyboard:has(.number:hover) .number,
+#keyboard:has(.number:hover) .number::after,
+#keyboard:has(.add-1:hover) .add-1,
+#keyboard:has(.add-1:hover) .add-1::after,
+#keyboard:has(.add-6:hover) .add-6,
+#keyboard:has(.add-6:hover) .add-6::after,
+#keyboard:has(.subtract-1:hover) .subtract-1,
+#keyboard:has(.subtract-1:hover) .subtract-1::after,
+#keyboard:has(.subtract-6:hover) .subtract-6,
+#keyboard:has(.subtract-6:hover) .subtract-6::after,
+#keyboard button[data-explanation]:not([data-explanation^=Team]):hover,
+#keyboard button[data-explanation]:not([data-explanation^=Team]):hover::after {
+	z-index: 101;
+	outline: 2px solid white;
+}
+#keyboard:has(.team.a:hover) .team.a:not([data-explanation^=Team]),
+#keyboard:has(.team.a:hover) .team.a[data-explanation^=Team]::after,
+#keyboard:has(.team.b:hover) .team.b:not([data-explanation^=Team]),
+#keyboard:has(.team.b:hover) .team.b[data-explanation^=Team]::after,
+#keyboard:has(.team.c:hover) .team.c:not([data-explanation^=Team]),
+#keyboard:has(.team.c:hover) .team.c[data-explanation^=Team]::after {
+	outline: 2px solid white;
 }

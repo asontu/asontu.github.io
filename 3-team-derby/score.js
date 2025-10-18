@@ -25,7 +25,10 @@ var DomState = new (function() {
 	var lastState = null;
 	this.setScore = (team, score) => $(`score${team}`).innerText = score;
 	this.setTeam = (team, name) => $(`team${team}`).innerText = name;
-	this.toggleHelp = () => $('help').classList.toggle('hidden');
+	this.toggleHelp = () => {
+		$('help-background').classList.toggle('hidden');
+		$('help').classList.toggle('hidden');
+	}
 	this.setJamClock = (to) => setSeconds('jamclock', to);
 	this.setPeriodClock = (to) => setSeconds('periodclock', to);
 	this.setPeriodNumber = (to) => $('period').innerText = to;
@@ -43,7 +46,7 @@ var DomState = new (function() {
 		reset ??= lastState === null;
 		for (let t = 0; t < 3; t++) {
 			if (reset || lastState.teams[t] !== newState.teams[t]) self.setTeam(t + 1, newState.teams[t]);
-			if (reset || lastState.score[t] !== newState.score[t]) self.setScore(t + 1, newState.score[t])
+			if (reset || lastState.score[t] !== newState.score[t]) self.setScore(t + 1, newState.score[t]);
 		}
 		if (reset || lastState.period.number !== newState.period.number) self.setPeriodNumber(newState.period.number);
 		if (reset || lastState.period.secondsLeft !== newState.period.secondsLeft) self.setPeriodClock(newState.period.secondsLeft);

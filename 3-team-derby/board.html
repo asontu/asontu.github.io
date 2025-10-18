@@ -27,21 +27,117 @@
 				<div class="time" id="jamclock" contenteditable="plaintext-only"></div>
 			</div>
 		</div>
+		<div id="help-background" class="hidden"></div>
 		<div id="help" class="hidden">
+			<div id="keyboard">
+				<div>
+					<button data-key="Esc" data-explanation="Start Official Time-out (or switch to Team Time-out)"></button>&nbsp;
+					<button data-key="F1"></button>
+					<button data-key="F2"></button>
+					<button data-key="F3"></button>
+					<button data-key="F4"></button>&nbsp;
+					<button data-key="F5"></button>
+					<button data-key="F6"></button>
+					<button data-key="F7"></button>
+					<button data-key="F8"></button>&nbsp;
+					<button data-key="F9"></button>
+					<button data-key="F10"></button>
+					<button data-key="F11"></button>
+					<button data-key="F12"></button>
+				</div>
+				<div>
+					<button data-key="~"></button>
+					<button data-key="1" class="number"></button>
+					<button data-key="2" class="number"></button>
+					<button data-key="3" class="number"></button>
+					<button data-key="4" class="number"></button>
+					<button data-key="5" class="number"></button>
+					<button data-key="6" class="number"></button>
+					<button data-key="7" class="number"></button>
+					<button data-key="8" class="number" data-explanation="Add seconds to the period clock (or substract with Shift)"></button>
+					<button data-key="9" class="number"></button>
+					<button data-key="0" class="number"></button>
+					<button data-key="-"></button>
+					<button data-key="="></button>
+					<button data-key="⬅︎"></button>
+				</div>
+				<div>
+					<button data-key="Tab" class="team a" data-explanation="Team 1"></button>
+					<button data-key="Q"></button>
+					<button data-key="W" class="subtract-6 team a" data-explanation="Subtract 6 points"></button>
+					<button data-key="E" class="subtract-1 team a" data-explanation="Subtract 1 point"></button>
+					<button data-key="R" class="add-1 team a" data-explanation="Add 1 point"></button>
+					<button data-key="T" class="add-6 team a" data-explanation="Add 6 points"></button>
+					<button data-key="Y"></button>
+					<button data-key="U"></button>
+					<button data-key="I"></button>
+					<button data-key="O" data-explanation="Start Official Review (only during Time-out)"></button>
+					<button data-key="P" data-explanation="Toggle between period 1 and 2"></button>
+					<button data-key="["></button>
+					<button data-key="]"></button>
+				</div>
+				<div>
+					<button data-key="Caps" class="team b" data-explanation="Team 2"></button>
+					<button data-key="A"></button>
+					<button data-key="S" class="subtract-6 team b"></button>
+					<button data-key="D" class="subtract-1 team b"></button>
+					<button data-key="F" class="add-1 team b"></button>
+					<button data-key="G" class="add-6 team b"></button>
+					<button data-key="H"></button>
+					<button data-key="J"></button>
+					<button data-key="K"></button>
+					<button data-key="L"></button>
+					<button data-key=";"></button>
+					<button data-key="'"></button>
+					<button data-key="\"></button>
+				</div>
+				<div>
+					<button data-key="Shift&nbsp;&nbsp;⇪" class="team c" data-explanation="Team 3"></button>
+					<button data-key="Z"></button>
+					<button data-key="X" class="subtract-6 team c"></button>
+					<button data-key="C" class="subtract-1 team c"></button>
+					<button data-key="V" class="add-1 team c"></button>
+					<button data-key="B" class="add-6 team c"></button>
+					<button data-key="N"></button>
+					<button data-key="M"></button>
+					<button data-key=","></button>
+					<button data-key="."></button>
+					<button data-key="/"></button>
+					<button data-key="⇪&nbsp;&nbsp;Shift" class="keep-size"></button>
+				</div>
+				<div>
+					<button data-key="Ctrl"></button>
+					<button data-key="❖"></button>
+					<button data-key="Alt"></button>
+					<button data-key="Space" data-explanation="Start next Line-up or Jam"></button>
+					<button data-key="Alt"></button>
+					<button data-key="❖"></button>
+					<button data-key="⊞"></button>
+					<button data-key="Ctrl"></button>
+				</div>
+			</div>
 			<h1>3-team Roller Derby Scoreboard</h1>
+			<p>This Roller Derby Scoreboard can display the score for 3 teams. It works completely on the client without any server. LocalStorage is used to save & restore information about the ongoing game, including continuing if the restored game was saved recent enough.</p>
+			<p>There is currently no "controls" screen, the operator views the scoreboard as-is, mirrored on a projector. Press <i>(<b>[shift]</b> +)</i> <b>[?]</b> to show/hide this help-screen.</p>
 			<h3>Set-up</h3>
-			<p>There is no "controls" screen, the operator views the scoreboard as-is, mirrored on a projector. Press <b>[shift]+[?]</b> to show/hide this help-screen.</p>
-			<p>Set the desired period-time in the "period" box and the desired half-time length in the "Line-up" box. Fill in the names for the teams. Press [space] or click on the "Line-up" to start the first Line-up time. The scoreboard never goes from "Line-up" to "Jam is on" or vice versa automatically, you have to press <b>[space]</b>.</p>
+			<p>Set the desired period-time in the "Period 1" box and the desired halftime length in the "Halftime length" box. Fill in the names for the teams. Press <b>[Space]</b> to start the first Line-up time. The scoreboard never goes from "Line-up" to "Jam is on" or vice versa automatically, you have to press <b>[Space]</b>.</p>
 			<h3>During game</h3>
+			<p>An overview of hotkey mapping is presented on the right. Move your mouse over the buttons to see how they relate.</p>
 			<table>
-				<tr><th>[space]</th><td>Cycles between <b>Line-up</b> and <b>Jam is on</b> until end of period is reached. After the first period half-time starts ticking and a <b>[space]</b> will start the 30 second line-up for the 2nd period. After the 2nd period, <b>[space]</b> will show <b>Final score</b>.</td></tr>
-				<tr><th>[Esc]</th><td>Cycles between <b>Official Time-out</b> and <b>Team Time-out</b> unless an Official Time-out is longer than a minute. You could press <b>[space]</b> to start a <b>Line-up</b> and then press <b>[Esc]</b> twice to start a new Team time-out.</td></tr>
-				<tr><th>[O]</th><td>Only available during Official or Team Time-out. Goes to <b>Official Review</b>.</td></tr>
-				<tr><th>[1-0]</th><td>Adds 1 through 10 seconds to the period clock. Or when <b>[Ctrl]</b> is helt down, subtracts 1 through 10 seconds from the period clock.</td></tr>
+				<tr><th>[Space]</th><td>"Normal" progression of the game, meaning it goes from set-up to the first <b>Line-up</b> and then cycles between <b>Line-up</b> and <b>Jam is on</b> until end of period is reached. After the first period half-time starts ticking and a <b>[Space]</b> will start the 30 second line-up for the 2nd period. After the 2nd period, <b>[Space]</b> will show <b>Unofficial score</b> and one more <b>[Space]</b> will go to <b>Final score</b>.</td></tr>
+				<tr><th>[Esc]</th><td>"Deviation" from normal game progression, meaning it starts an <b>Official Time-out</b> and then cycles between <b>Official Time-out</b> and <b>Team Time-out</b> unless an Official Time-out is longer than a minute. You could press <b>[Space]</b> to start a <b>Line-up</b> and then press <b>[Esc]</b> twice to start a new Team time-out. During half-time, <b>[Esc]</b> will switch back to the 1st period to allow for one more jam, but be sure to add at least 1 second to the period clock for <b>[Space]</b> to start <b>Line-up</b> and not restart halftime. The same goes for the end of period 2.</td></tr>
+				<tr><th>[O]</th><td>Goes to <b>Official Review</b>. Only available during Official or Team Time-out.</td></tr>
+				<tr><th>[P]</th><td>Cycles between 1st period and 2nd period.</td></tr>
+				<tr><th>[Ctrl+Z] [Cmd+Z]</th><td>Undo the last action from one of the above (Jam start, Time-out start, OR start, Period switch). You can undo up to 10 actions.</td></tr>
+				<tr><th>[Ctrl+Shift+Z] [Cmd+Shift+Z]</th><td>Redo the last action that was undone. You can redo up to 10 actions so long as you don't start a new action with <b>[Space]</b>, <b>[Esc]</b>, <b>[O]</b> or <b>[P]</b>.</td></tr>
+				<tr><th>[1]-[0]</th><td>Adds 1 through 10 seconds to the period clock. Or when <b>[Shift]</b> is helt down, subtracts 1 through 10 seconds from the period clock.</td></tr>
 				<tr><th>[E] [R]</th><td>Respectively substracts/adds a point for team 1.</td></tr>
 				<tr><th>[D] [F]</th><td>Respectively substracts/adds a point for team 2.</td></tr>
 				<tr><th>[C] [V]</th><td>Respectively substracts/adds a point for team 3.</td></tr>
-				<tr><th>[P]</th><td>Cycles between 1st period and 2nd period.</td></tr>
+				<tr><th>[W] [T]</th><td>Respectively substracts/adds 6 points for team 1.</td></tr>
+				<tr><th>[S] [G]</th><td>Respectively substracts/adds 6 points for team 2.</td></tr>
+				<tr><th>[X] [B]</th><td>Respectively substracts/adds 6 points for team 3.</td></tr>
+				<tr><th>[Ctrl+Esc]</th><td>Completely reset game, only team-names and length of period/halftime are kept. This cannot be undone! It prompts for confirmation first, but this does halt the running clocks (known issue).</td></tr>
 				<tr><th>[?]</th><td>Hides/shows this screen</td></tr>
 			</table>
 			<p align="right">made by The Hoarse Whistler</p>
