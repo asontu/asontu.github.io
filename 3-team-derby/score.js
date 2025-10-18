@@ -189,7 +189,7 @@ var GameState = new (function() {
 				internalState.jam.secondsLeft = 0;
 			break;
 			case (!PERIOD_CLOCK_STOPPED.includes(internalState.stage) // Period clock was running and both jam and period have more time than lost since last updated
-				&& Math.min(internalState.period.secondsLeft, internalState.jam.secondsLeft) > secondsSinceLastUpdated): // substract from both clocks and continue timing
+				&& Math.min(internalState.period.secondsLeft, internalState.jam.secondsLeft) > secondsSinceLastUpdated): // subtract from both clocks and continue timing
 				internalState.period.secondsLeft -= secondsSinceLastUpdated;
 				internalState.jam.secondsLeft -= secondsSinceLastUpdated;
 				continuePeriod();
@@ -390,7 +390,7 @@ var GameState = new (function() {
 	}
 	
 	function jamSecondElapsed() {
-		// substract a second, unless we're in OTO or OR which can last as long as needed
+		// subtract a second, unless we're in OTO or OR which can last as long as needed
 		internalState.jam.secondsLeft += [OTO, OR].includes(internalState.stage) ? 1 : -1;
 		// if that results in less than 0 seconds, set to 0
 		if (internalState.jam.secondsLeft < 0)
