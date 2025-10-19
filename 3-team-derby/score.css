@@ -154,20 +154,16 @@ th {
 #keyboard {
 	position: relative;
 	float: right;
-	margin: 10em 10em 1em 1em;
-}
-#keyboard::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	width: 5em;
-	background: linear-gradient(to left, #000 25%, transparent);
-
+	margin: 10em 8em 1em 1em;
 }
 #keyboard > div {
-	margin-top: 4px;
+	display: flex;
+	align-items: flex-end;
+	gap: 3px;
+	margin-top: 3px;
+}
+#keyboard button:last-of-type {
+	flex: 1;
 }
 #keyboard button {
 	position: relative;
@@ -177,20 +173,17 @@ th {
 	width: 2em;
 	padding: 1px 0;
 }
+#keyboard div:first-of-type button:not(:first-of-type) {
+	width: 2.1em !important;
+}
 #keyboard button::before {
 	content: attr(data-key);
 }
-#keyboard button[data-key^=F]:not([data-key=F]) {
-	padding: 1px 2px;
-}
-#keyboard button[data-key^=F1]:not([data-key=F1]) {
-	padding: 1px 0 !important;
-}
-#keyboard button[data-key=I] {
-	width: 1.8em;
+#keyboard button[data-key=Esc] {
+	padding: 1px 3px;
 }
 #keyboard button[data-key=Space] {
-	width: 13em;
+	width: 14em;
 	color: transparent;
 }
 #keyboard button:not(.number):not(.team):not([data-explanation]) {
@@ -210,7 +203,7 @@ th {
 	transform-origin: bottom left;
 	transform: rotate(-35deg);
 }
-#keyboard button[data-key='8'][data-explanation]::after{
+#keyboard button[data-key='8'][data-explanation]::after {
 	transform: rotate(-30deg);
 }
 #keyboard button[data-key=Esc][data-explanation]::after,
@@ -222,8 +215,8 @@ th {
 }
 #keyboard button[data-explanation^=Team]::after {
 	transform: none;
-	top: -2px;
-	left: -2px;
+	top: -3px;
+	left: -3px;
 }
 #keyboard:has(.number:hover) .number,
 #keyboard:has(.number:hover) .number::after,
@@ -235,16 +228,15 @@ th {
 #keyboard:has(.subtract-1:hover) .subtract-1::after,
 #keyboard:has(.subtract-6:hover) .subtract-6,
 #keyboard:has(.subtract-6:hover) .subtract-6::after,
-#keyboard button[data-explanation]:not([data-explanation^=Team]):hover,
-#keyboard button[data-explanation]:not([data-explanation^=Team]):hover::after {
+#keyboard:has(.team.a:hover) .team.a[data-explanation^=Team]::after,
+#keyboard:has(.team.b:hover) .team.b[data-explanation^=Team]::after,
+#keyboard:has(.team.c:hover) .team.c[data-explanation^=Team]::after,
+#keyboard button[data-explanation]:not([data-explanation^=Team]):hover {
 	z-index: 101;
 	outline: 2px solid white;
 }
 #keyboard:has(.team.a:hover) .team.a:not([data-explanation^=Team]),
-#keyboard:has(.team.a:hover) .team.a[data-explanation^=Team]::after,
 #keyboard:has(.team.b:hover) .team.b:not([data-explanation^=Team]),
-#keyboard:has(.team.b:hover) .team.b[data-explanation^=Team]::after,
-#keyboard:has(.team.c:hover) .team.c:not([data-explanation^=Team]),
-#keyboard:has(.team.c:hover) .team.c[data-explanation^=Team]::after {
+#keyboard:has(.team.c:hover) .team.c:not([data-explanation^=Team]) {
 	outline: 2px solid white;
 }
