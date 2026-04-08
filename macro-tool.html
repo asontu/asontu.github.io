@@ -156,7 +156,7 @@ return '.value(\\'@col' + (i+1) + '\\', \\'varchar(max)\\') ' +
 		return m.charAt(m.length-1).toUpperCase();
 	}) + '\\t-- ' + colCode;`,
 `var ret = '-- ';
-row = row.toLowerCase().replace(/[^a-z0-9 .()[\\]<>\\/\\\\'"|!?@#=_+-]/g,` + /* fix highlight ' */ ` '');
+row = row.toLowerCase().replace(/[^a-z0-9 .()[\\]<>\\/\\\\'"|!?@#=_+-]/g, '');
 var l = row.length;
 for (var o = 0; o < 5; o++) {
 	for (var n = 0; n < l; n++) {
@@ -526,6 +526,37 @@ return ret;`];
 		window.onload = function() {
 			set('From');
 			set('To');
+			(function() {
+				let localWakeLock;
+				async function aquireWakeLock() {
+					try {
+						localWakeLock = await top.navigator.wakeLock.request('screen');
+					} catch (err) {
+						console.error(err);
+						return;
+					}
+					
+					if (top.document.title.charAt(0) !== '🟢') {
+						top.document.title='🟢'+top.document.title;
+					}
+					localWakeLock.onrelease = function(e) {
+						top.document.title=top.document.title.replace(/^🟢+/,'');
+					}
+				};
+				
+				$('persistWakeLock').addEventListener('click', (e) => {
+					if (e.target.checked) {
+						aquireWakeLock();
+					} else {
+						localWakeLock.release();
+					}
+				});
+				document.addEventListener('visibilitychange', () => {
+					if (document.visibilityState === 'visible' && $('persistWakeLock').checked) {
+						aquireWakeLock();
+					}
+				});
+			})();
 		}
 	</script>
 </head>
@@ -619,7 +650,8 @@ return ret;`];
 	</td><td style="position:relative">
 		<input type="text" id="sepTo" size="10" /><label><input type="checkbox" checked="checked" id="lnTo" />\n</label>
 		<button type="button" id="goTo">\/ Go</button>
-		<a style="position:absolute;right:1em" href="javascript:(async function(){wakeLock = await top.navigator.wakeLock.request('screen');if(top.document.title.indexOf('🟢')<0){top.document.title='🟢'+top.document.title;}wakeLock.onrelease=function(e){if(top.document.title.indexOf('🟢')>-1){top.document.title=top.document.title.replace('🟢','')}}})();">Wake lock</a>
+		<input type="checkbox" id="persistWakeLock" style="position:absolute;right:1em;">
+		<a style="position:absolute;right:3em" href="javascript:(async function(){wakeLock = await top.navigator.wakeLock.request('screen');if(top.document.title.indexOf('🟢')<0){top.document.title='🟢'+top.document.title;}wakeLock.onrelease=function(e){if(top.document.title.indexOf('🟢')>-1){top.document.title=top.document.title.replace('🟢','')}}})();">Wake lock</a>
 	</td></tr>
 	<tr height="33%">
 		<td colspan="2"><input type="text" id="countOutFrom" size="10" value="1" readonly /><textarea id="outFrom" wrap="off"></textarea></td>
